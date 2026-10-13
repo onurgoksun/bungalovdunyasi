@@ -24,31 +24,30 @@ LOGO_SVG = ('<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 
             'stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" '
             'stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>')
 
-HERO_SVG = """<svg viewBox="0 0 440 380" role="img" aria-label="Gece göl kenarında, penceresi yanan A-frame bungalov">
-  <defs>
-    <radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffc56b" stop-opacity=".85"/><stop offset="1" stop-color="#e39a3b" stop-opacity="0"/></radialGradient>
-  </defs>
-  <circle cx="352" cy="64" r="16" fill="#e9f0ec" opacity=".9"/>
-  <g fill="#1f4239">
-    <path d="M18 300 44 214l26 86z"/><path d="M52 300 84 186l32 114z"/><path d="M330 300l30-104 30 104z"/><path d="M372 300l26-86 26 86z"/>
-  </g>
-  <g fill="#2a5246">
-    <path d="M0 300 22 236l22 64z"/><path d="M396 300l22-70 22 70z"/>
-  </g>
-  <circle class="window-glow" cx="220" cy="246" r="70" fill="url(#g)"/>
-  <path d="M120 300 220 98l100 202" fill="none" stroke="#e9f0ec" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M150 300 220 158l70 142" fill="none" stroke="#e9f0ec" stroke-width="3" stroke-linejoin="round" opacity=".75"/>
-  <path d="M220 158v142M185 230h70" stroke="#e9f0ec" stroke-width="2" opacity=".5"/>
-  <rect class="window-glow" x="196" y="236" width="48" height="64" fill="#e39a3b"/>
-  <rect x="104" y="298" width="232" height="5" fill="#e9f0ec"/>
-  <rect x="0" y="303" width="440" height="77" fill="#10261f"/>
-  <g stroke="#e39a3b" stroke-linecap="round" opacity=".75">
-    <path d="M200 318h40" stroke-width="4"/><path d="M206 332h28" stroke-width="3" opacity=".7"/><path d="M212 346h16" stroke-width="2" opacity=".5"/>
-  </g>
-  <g stroke="#e9f0ec" stroke-linecap="round" opacity=".25" stroke-width="2">
-    <path d="M30 326h60M120 340h50M290 324h70M350 352h60M60 362h40"/>
-  </g>
-</svg>"""
+# Temsili görseller — Unsplash Lisansı (ticari kullanım serbest, izin gerekmez)
+PHOTOS = {
+    "hero": ("https://images.unsplash.com/photo-1576874748772-584aa2bee2d4", "Akşam ışıkları yanan A-frame bungalov, orman içinde", "Cameron Stewart", "BU-tn41KnR8"),
+    "pool": ("https://images.unsplash.com/photo-1768178540284-ab256d312e61", "Orman içinde küçük havuzlu A-frame bungalov", "Osman Espinoza Franco", "TJY-rtSJunI"),
+    "snow": ("https://images.unsplash.com/photo-1638985787285-46f05ff063f2", "Karlı ormanda A-frame bungalov", "Michal Janek", "e9DkjLz5FuU"),
+    "dog": ("https://images.unsplash.com/photo-1642387922923-cf4cacf42ae9", "Şöminenin önünde uzanan köpek", "Djordje Vukojicic", "51Fin-fJTNk"),
+    "lake": ("https://images.unsplash.com/photo-1496060169243-453fde45943b", "Göl kıyısında sisli orman", "Sam Ferrara", "iecJiKe_RNg"),
+    "inside": ("https://images.unsplash.com/photo-1631941392209-70cad44ecfb7", "Şömineli ahşap bungalov iç mekânı", "Hans", "_k0Pyd1uMEc"),
+}
+
+
+def ux(key, w, h):
+    return f"{PHOTOS[key][0]}?auto=format&fit=crop&w={w}&h={h}&q=72"
+
+
+def credit(key):
+    _, _, who, pid = PHOTOS[key]
+    return f'Temsili görsel. Fotoğraf: <a href="https://unsplash.com/photos/{pid}" rel="noopener">{esc(who)}</a>, Unsplash'
+
+
+def cover(key):
+    return (f'<figure class="cover"><img src="{ux(key, 1600, 800)}" srcset="{ux(key, 800, 400)} 800w, {ux(key, 1600, 800)} 1600w" '
+            f'sizes="(max-width: 1120px) 100vw, 1080px" alt="{esc(PHOTOS[key][1])}" width="1600" height="800">'
+            f'<figcaption>{credit(key)}</figcaption></figure>')
 
 NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/hakkimizda/", "Hakkımızda")]
 
@@ -60,7 +59,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
     ld = ""
     for s in (schema or []):
         ld += f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>\n'
-    og = og_image or (UP + "labella-bungalov-sapanca-6-819x1024.webp")
+    og = og_image or ux("hero", 1200, 630)
     return f"""<!doctype html>
 <html lang="tr">
 <head>
@@ -81,7 +80,8 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=1">
+<link rel="stylesheet" href="/style.css?v=2">
+<link rel="preconnect" href="https://images.unsplash.com">
 {ld}</head>
 <body>
 <a class="skip" href="#icerik">İçeriğe geç</a>
@@ -187,8 +187,11 @@ SLOT = f"""<div class="slot">
 GUIDES = []
 
 
+GUIDE_IMG = {"sapanca-bungalov-kiralamadan-once-sorulacak-sorular": "pool", "kisin-sapanca-bungalov-isitmali-havuz-jakuzi-somine": "snow", "evcil-hayvanla-sapanca-bungalov": "dog"}
+
+
 def guide(slug, title, seo_title, desc, minutes, body, faq=None):
-    GUIDES.append(dict(slug=slug, title=title, seo_title=seo_title, desc=desc, minutes=minutes, body=body, faq=faq or []))
+    GUIDES.append(dict(slug=slug, title=title, seo_title=seo_title, desc=desc, minutes=minutes, body=body, faq=faq or [], img=GUIDE_IMG[slug]))
 
 
 ASK_MSG = ("Merhaba, Bungalov Dünyası'ndan ulaşıyorum. [giriş tarihi] – [çıkış tarihi] arası [kişi sayısı] kişi için "
@@ -343,14 +346,17 @@ def build_home():
         ("/rehber/evcil-hayvanla-sapanca-bungalov/", "Evcil hayvanla"),
         ("/rehber/sapanca-bungalov-kiralamadan-once-sorulacak-sorular/", "İlk kez kiralayacağım")])
     body = f"""
-<section class="hero"><div class="wrap">
-  <div class="copy">
-    <h1>Sapanca'da bungalov, fotoğrafın ötesiyle.</h1>
-    <p class="lead">Havuz gerçekten özel mi, jakuzi kışın sıcak mı, şömine yanıyor mu? Tesisleri ayrıntısıyla anlatıyor, sizi doğrudan tesisle buluşturuyoruz.</p>
-    <div class="find" aria-label="Ne arıyorsunuz?">{find}</div>
+<section class="hero">
+  <img class="hero-img" src="{ux('hero', 1920, 1100)}" srcset="{ux('hero', 900, 1100)} 900w, {ux('hero', 1920, 1100)} 1920w" sizes="100vw" alt="{esc(PHOTOS['hero'][1])}" fetchpriority="high">
+  <div class="wrap">
+    <div class="copy">
+      <h1>Sapanca'da bungalov, fotoğrafın ötesiyle.</h1>
+      <p class="lead">Havuz gerçekten özel mi, jakuzi kışın sıcak mı, şömine yanıyor mu? Tesisleri ayrıntısıyla anlatıyor, sizi doğrudan tesisle buluşturuyoruz.</p>
+      <div class="find" aria-label="Ne arıyorsunuz?">{find}</div>
+    </div>
+    <p class="hero-credit">{credit('hero')}</p>
   </div>
-  <div class="hero-art">{HERO_SVG}</div>
-</div></section>
+</section>
 
 <section class="block"><div class="wrap">
   <div class="head"><h2>Tesisler</h2><p>Her tesisi tek tek tanıyoruz. Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan bungalovlar giriyor.</p></div>
@@ -375,7 +381,7 @@ def build_home():
 
 
 def guide_list():
-    items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min">{g["minutes"]} dk okuma</span></a></li>' for g in GUIDES)
+    items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min">{g["minutes"]} dk okuma</span></a></li>' for g in GUIDES)
     return f'<ul class="guides">{items}</ul>'
 
 
@@ -499,6 +505,7 @@ def build_guides():
         body = f"""
 <div class="wrap">{crumbs([("/rehber/", "Rehber"), (None, g["title"])])}
 <header class="page-head"><h1>{esc(g["title"])}</h1><p>{esc(g["desc"])}</p><div class="meta">{g["minutes"]} dk okuma</div></header>
+{cover(g["img"])}
 <div class="layout">
 <article class="prose">
 {g["body"]}
@@ -515,14 +522,14 @@ def build_guides():
 </div>
 """
         schema = [{"@context": "https://schema.org", "@type": "Article", "headline": g["title"], "description": g["desc"],
-                   "inLanguage": "tr", "datePublished": TODAY, "dateModified": TODAY, "mainEntityOfPage": SITE + path,
+                   "inLanguage": "tr", "image": ux(g["img"], 1200, 630), "datePublished": TODAY, "dateModified": TODAY, "mainEntityOfPage": SITE + path,
                    "author": {"@type": "Organization", "name": NAME, "url": SITE + "/"},
                    "publisher": {"@type": "Organization", "name": NAME, "url": SITE + "/"}},
                   crumbs_ld([("/rehber/", "Rehber"), (path, g["title"])])]
         if g["faq"]:
             schema.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
                 {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in g["faq"]]})
-        write(path, page(path, g["seo_title"] + " | Bungalov Dünyası", g["desc"], body, schema, active="/rehber/"))
+        write(path, page(path, g["seo_title"] + " | Bungalov Dünyası", g["desc"], body, schema, active="/rehber/", og_image=ux(g["img"], 1200, 630)))
 
 
 def build_owner():
@@ -531,6 +538,7 @@ def build_owner():
 <div class="wrap">{crumbs([(None, "Tesisinizi ekleyin")])}
 <header class="page-head"><h1>Tesisinizi ücretsiz ekleyin</h1>
 <p>Sapanca ve çevresinde bungalov işletiyorsanız tesisinizi rehbere ekleyelim. Misafir size doğrudan ulaşır; komisyon ya da listeleme ücreti yok.</p></header>
+{cover("inside")}
 <div class="layout">
 <div class="prose">
   <h2>Ne kazanırsınız?</h2>
@@ -573,6 +581,7 @@ def build_about():
 <div class="wrap">{crumbs([(None, "Hakkımızda")])}
 <header class="page-head"><h1>Hakkımızda</h1>
 <p>Bungalov Dünyası, Sapanca'da bungalov arayanların fotoğrafların ötesini görmesi için hazırlanan bir rehber.</p></header>
+{cover("lake")}
 <div class="prose">
   <p>Sapanca'da bungalov ilanları birbirine çok benziyor. Hangisinin havuzu gerçekten özel, hangisinin jakuzisi kışın sıcak, hangisinde evcil hayvan kabul ediliyor, çoğu zaman ancak tesise sorarak öğrenebiliyorsunuz. Bu rehberi o soruların cevaplarını baştan yazmak için hazırlıyoruz.</p>
   <h2>Nasıl çalışıyoruz?</h2>
