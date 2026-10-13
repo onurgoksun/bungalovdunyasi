@@ -3,7 +3,7 @@
 import html, json, os, shutil, datetime
 from urllib.parse import quote
 
-SITE = "https://bungalovdunyasi.com"
+SITE = "https://bungalovdunyasi.tr"
 NAME = "Bungalov Dünyası"
 WA = "905327222545"
 TODAY = datetime.date.today().isoformat()
@@ -618,7 +618,7 @@ def build_meta():
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod></url>\n" for u in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
     write("/robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
-    write("/CNAME", "bungalovdunyasi.com\n")
+    write("/CNAME", "bungalovdunyasi.tr\n")
     write("/.nojekyll", "")
     fav = LOGO_SVG.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"').replace("currentColor", "#15302b")
     write("/favicon.svg", fav)
