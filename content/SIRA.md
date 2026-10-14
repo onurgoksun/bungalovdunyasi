@@ -4,7 +4,7 @@ Otomatik görev her çalıştığında listedeki ilk `[ ]` satırı yazar, yayı
 Sırayı değiştirmek için satırların yerini değiştirin. Yeni konu eklemek için aynı biçimde satır ekleyin.
 Biçim: `- [ ] başlık önerisi | slug | görsel anahtarı | not`
 
-- [ ] Sapanca'da bungalov için hangi semt? Memnuniye, Rüstempaşa, Yanık, Nailiye, Kırkpınar, Maşukiye | sapanca-bungalov-hangi-semt | forestlake | Semtleri göle uzaklık, sessizlik, yol, manzara açısından karşılaştır. Labella Memnuniye'de; açıklık notuyla bahset.
+- [x] Sapanca'da bungalov için hangi semt? Memnuniye, Rüstempaşa, Yanık, Nailiye, Kırkpınar, Maşukiye | sapanca-bungalov-hangi-semt | forestlake | Semtleri göle uzaklık, sessizlik, yol, manzara açısından karşılaştır. Labella Memnuniye'de; açıklık notuyla bahset. | yayın: 2026-10-14
 - [ ] Sapanca bungalov fiyatları neden bu kadar farklı? | sapanca-bungalov-fiyatlari-neden-farkli | firepit | Rakam verme ya da yalnızca kaynağı belli genel aralık ver; fiyatı etkileyen etkenleri anlat.
 - [ ] Balayı için Sapanca'da bungalov: gizlilik, jakuzi, süsleme, kahvaltı | sapanca-balayi-bungalov | stars |
 - [ ] Kalabalık grup için Sapanca'da bungalov (6-10 kişi) | sapanca-kalabalik-grup-bungalov | fireplace |
