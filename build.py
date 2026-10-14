@@ -56,7 +56,20 @@ def cover(key):
 NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/uygulama/", "İşletmeciler için"), ("/hakkimizda/", "Hakkımızda")]
 
 
-JSV = "4"
+def _hash(*paths):
+    import hashlib
+    h = hashlib.sha1()
+    for base in paths:
+        full = os.path.join(os.path.dirname(os.path.abspath(__file__)), base)
+        files = [full] if os.path.isfile(full) else sorted(os.path.join(d, f) for d, _, fs in os.walk(full) for f in fs)
+        for fp in files:
+            with open(fp, "rb") as f:
+                h.update(f.read())
+    return h.hexdigest()[:8]
+
+
+JSV = _hash("src/js")      # dosya değişince tarayıcı önbelleği yenilenir
+CSSV = _hash("src/style.css")
 SB_JS = "/js/vendor/supabase-2.117.0.js"
 
 
@@ -93,7 +106,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=4">
+<link rel="stylesheet" href="/style.css?v={CSSV}">
 <link rel="preconnect" href="https://images.unsplash.com">
 {ld}</head>
 <body>
