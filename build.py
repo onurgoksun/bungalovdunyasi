@@ -53,7 +53,7 @@ def cover(key):
             f'sizes="(max-width: 1120px) 100vw, 1080px" alt="{esc(PHOTOS[key][1])}" width="1600" height="800">'
             f'<figcaption>{credit(key)}</figcaption></figure>')
 
-NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/hakkimizda/", "Hakkımızda")]
+NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/uygulama/", "İşletmeciler için"), ("/hakkimizda/", "Hakkımızda")]
 
 
 def page(path, title, desc, body, schema=None, active=None, og_image=None):
@@ -84,7 +84,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=2">
+<link rel="stylesheet" href="/style.css?v=3">
 <link rel="preconnect" href="https://images.unsplash.com">
 {ld}</head>
 <body>
@@ -266,7 +266,7 @@ def owner_band():
       <li>Ücretsiz Bungalov Yönetim uygulaması: takvim, rezervasyon ve misafir mesajları tek yerde</li>
       <li>Kendi web sitenize ekleyebileceğiniz rezervasyon sayfası</li>
     </ul>
-    <p style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Nasıl eklenir?</a></p>
+    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Nasıl eklenir?</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
   </div>
 </div></section>"""
 
@@ -414,7 +414,7 @@ def build_owner():
   <ul>
     <li><strong>Tesis sayfası:</strong> Fotoğraflarınız, olanaklarınız, kurallarınız ve doğrudan iletişim butonlarınız.</li>
     <li><strong>Doğrudan misafir:</strong> Misafir WhatsApp'tan ya da telefonla size yazar. Rezervasyonu ve ödemeyi kendiniz yönetirsiniz.</li>
-    <li><strong>Bungalov Yönetim uygulaması, ücretsiz:</strong> Bungalovlarınızın doluluk takvimi, rezervasyon ve kapora takibi, misafire hazır WhatsApp mesajları, çıkış sonrası misafir anketi. Windows, Android, iPhone ve iPad'de çalışır.</li>
+    <li><strong>Bungalov Yönetim uygulaması, ücretsiz:</strong> Bungalovlarınızın doluluk takvimi, rezervasyon ve kapora takibi, misafire hazır WhatsApp mesajları, çıkış sonrası misafir anketi. Windows, Android, iPhone ve iPad'de çalışır. <a href="/uygulama/">Uygulamayı inceleyin</a>.</li>
     <li><strong>Kendi rezervasyon sayfanız:</strong> Misafirin boş tarihleri görüp talep bırakabildiği, kendi sitenize ve Instagram'ınıza ekleyebileceğiniz bir sayfa.</li>
   </ul>
   <h2>Nasıl eklenir?</h2>
@@ -443,6 +443,123 @@ def build_owner():
     write("/tesis-ekle/", page("/tesis-ekle/", "Bungalov Tesisinizi Ücretsiz Ekleyin – Bungalov Dünyası",
                                "Sapanca'da bungalov tesisinizi Bungalov Dünyası'na ücretsiz ekleyin. Komisyonsuz doğrudan misafir ve ücretsiz Bungalov Yönetim uygulaması.",
                                body, [crumbs_ld([("/tesis-ekle/", "Tesisinizi ekleyin")])]))
+
+
+# ---------------------------------------------------------------- Uygulama tanıtımı
+APP_FEATURES = [
+    ("takvim", "Bütün bungalovlar tek ekranda",
+     "Hangi bungalov dolu, kim bugün geliyor, kimin çıkışı var, iki haftalık panoda bir bakışta görürsünüz. Sağdaki <strong>Bugün</strong> paneli ödemesi kalanları, gelecekleri ve çıkış yapacakları sıralar.",
+     ["Airbnb ve Booking rezervasyonları takvim bağlantısıyla kendiliğinden gelir", "Aynı geceye iki rezervasyon girilemez", "Hafta sonu hava durumuna göre fiyat hatırlatması"]),
+    ("form", "Rezervasyonu bir dakikada girin",
+     "Misafirin adını, bungalovu ve tarihleri seçin. Hafta içi, hafta sonu ve bayram gecelerinin fiyatı kendiliğinden hesaplanır; gece gece dökümü formda görünür.",
+     ["Kapora ve kalan ödeme takibi", "Ek yatak, kahvaltı gibi ek hizmetler", "Sendika ve kampanya indirimleri"]),
+    ("whatsapp", "Misafire hazır WhatsApp mesajları",
+     "Onay, giriş hatırlatması, kalan ödeme, teşekkür ve anket mesajları misafirin adı, tarihleri ve tutarıyla hazır gelir. Dilerseniz düzenler, tek tuşla WhatsApp'ta açarsınız.",
+     ["Mesajı WhatsApp'tan siz gönderirsiniz", "Yazım derdi ve unutma yok"]),
+    ("cikis", "Çıkışta misafiri değerlendirin",
+     "Misafir ayrılırken bungalovu nasıl bıraktığını, kurallara uyup uymadığını ve tekrar ağırlamak isteyip istemediğinizi işaretlersiniz. Bir dahaki rezervasyonda bu bilgi karşınıza çıkar.",
+     ["Yıldızla puan ve not", "Kara liste", "Çıkış sonrası misafire memnuniyet anketi, cevaplar uygulamada"]),
+    ("fiyat", "Bayramlar ve tatiller fiyatınızda",
+     "Resmi tatiller, bayramlar, arefeler ve okul tatilleri takvimde hazır. Hangisine özel gün fiyatı uygulanacağını tek dokunuşla seçersiniz.",
+     ["Hafta içi, hafta sonu ve özel gün fiyatı", "Uzun konaklamaya gece gece artan indirim", "Belirli tarihler için kampanya"]),
+    ("hesap", "Ayın kârını her an bilin",
+     "Gelen para, giden para, kasadaki tutar ve misafirlerden henüz alınmayan ödemeler tek sayfada. Elektrik, temizlik, bakım gibi giderleri kendi kategorilerinizle girersiniz.",
+     ["Aylık kâr/zarar", "Alınan ve alınacak ödemeler ayrı", "Geçen ayın giderlerini tek tuşla kopyalama"]),
+    ("piyasa", "Rakip fiyatlarını takip edin",
+     "Aynı tarihler için Airbnb, Tatil Sepeti, Booking, Etstur ve Tatilbudur aramalarını tek tıkla açın. Gördüğünüz fiyatları kaydedin; piyasa ortalaması ve sizin konumunuz hesaplanır.",
+     ["Hafta sonu ve bayram için hızlı tarih seçimi", "En düşük, en yüksek ve ortalama"]),
+]
+
+APP_EXTRAS = [
+    ("Bilgisayar, telefon, tablet", "Windows bilgisayarda, Android telefonda, iPhone ve iPad'de çalışır."),
+    ("Bütün cihazlar aynı bilgiyi görür", "Bir cihazda girilen rezervasyon birkaç saniye içinde diğerlerine gelir."),
+    ("Ekip için ayrı kullanıcılar", "Siz yönetici olursunuz; çalışanlarınıza kendi kullanıcı adlarını ve yetkilerini verirsiniz."),
+    ("İnternet kesilse de çalışır", "Çevrimdışıyken girdikleriniz bağlantı gelince kendiliğinden eşitlenir."),
+    ("Kendi rezervasyon sayfanız", "Misafirin boş tarihleri görüp talep bıraktığı sayfa. Web sitenize ve Instagram'ınıza eklersiniz; talepler uygulamaya düşer."),
+    ("Kendini güncelleyen uygulama", "Yeni özellikler geldiğinde uygulama size sorar ve tek tuşla güncellenir."),
+]
+
+APP_FAQ = [
+    ("Uygulama gerçekten ücretsiz mi?", "Evet. Bungalov Dünyası rehberine katılan tesisler uygulamayı ücretsiz kullanır. Kurulum ya da aylık ücret yok."),
+    ("Verilerim kimde duruyor?", "Rezervasyonlarınız ve misafir bilgileriniz tesisinize ait bulut hesabında durur. Başka bir tesis sizin verinizi göremez. Uygulama her gün yedek de alır."),
+    ("Bilgisayar kullanmayı pek bilmiyorum, zorlanır mıyım?", "Uygulama bilgisayara alışık olmayanlar düşünülerek sade tasarlandı. İlk açılışta kısa bir tur adım adım gösterir; kurulumu da sizinle birlikte yaparız."),
+    ("Airbnb ve Booking'deki rezervasyonlarım ne olacak?", "Ayarlar'a ilanınızın takvim bağlantısını eklersiniz; o ilanlardaki rezervasyonlar 30 dakikada bir uygulamaya gelir. Elle rezervasyon girdiğinizde Airbnb'de tarihi kapatmanız için hatırlatma çıkar."),
+    ("Kaç bungalovum olursa kullanabilirim?", "Bungalov sayısı sınırı yok. Bungalov ekleyip çıkarabilir, adlarını değiştirebilirsiniz."),
+]
+
+
+def build_app():
+    msg = wa("Merhaba, Bungalov Yönetim uygulamasını tesisim için kullanmak istiyorum. Tesis adı: [ ], bungalov sayısı: [ ].")
+    shot = lambda n, alt, eager=False: (f'<img src="/img/uygulama/{n}.webp" srcset="/img/uygulama/{n}-720.webp 720w, /img/uygulama/{n}.webp 1440w" '
+                                        f'sizes="(max-width: 860px) 100vw, 640px" width="1440" height="900" alt="{esc(alt)}" loading="{"eager" if eager else "lazy"}">')
+    rows = ""
+    for i, (n, h, p, pts) in enumerate(APP_FEATURES):
+        li = "".join(f"<li>{esc(x)}</li>" for x in pts)
+        rows += f"""<section class="feat{' flip' if i % 2 else ''}">
+  <figure class="screen">{shot(n, h + ' — Bungalov Yönetim ekranı (örnek veriler)')}</figure>
+  <div class="feat-text"><h2>{esc(h)}</h2><p>{p}</p><ul class="ticks">{li}</ul></div>
+</section>
+"""
+    extras = "".join(f'<div class="extra"><h3>{esc(t)}</h3><p>{esc(d)}</p></div>' for t, d in APP_EXTRAS)
+    faq = "".join(f"<h3>{esc(q)}</h3><p>{esc(a)}</p>" for q, a in APP_FAQ)
+    body = f"""
+<section class="app-hero"><div class="wrap">
+  {crumbs([(None, "Bungalov Yönetim")])}
+  <div class="app-hero-grid">
+    <div class="app-hero-copy">
+      <p class="kicker">Bungalov işletmecileri için ücretsiz uygulama</p>
+      <h1>Defter, Excel ve WhatsApp arasında koşturmaya son.</h1>
+      <p class="lead">Bungalov Yönetim; rezervasyonu, kaporayı, misafir mesajlarını ve ayın hesabını tek yerde tutar. Sapanca'da beş bungalovluk bir işletme, kendi ihtiyacı için geliştirdi ve her gün kullanıyor.</p>
+      <div class="actions"><a class="btn ember" href="{msg}" rel="noopener">Ücretsiz kullanmak istiyorum</a><a class="btn ghost-light" href="#ozellikler">Neler yapıyor?</a></div>
+    </div>
+    <figure class="screen hero-screen">{shot("takvim", "Bungalov Yönetim takvim ekranı: beş bungalovun iki haftalık doluluk panosu (örnek veriler)", True)}</figure>
+  </div>
+</div></section>
+
+<section class="block pains"><div class="wrap">
+  <div class="head"><h2>Tanıdık geliyor mu?</h2></div>
+  <div class="pain-grid">
+    <p>Aynı hafta sonuna iki misafir yazılmış, biri telefonda, biri Airbnb'de.</p>
+    <p>Kimin kaporası geldi, kim girişte ödeyecek, deftere bakmadan hatırlanmıyor.</p>
+    <p>Bayram fiyatını değiştirmeyi unutup tatili hafta içi fiyatına vermişsiniz.</p>
+    <p>Ay sonunda elektrik, temizlik, erzak derken kâr mı ettik zarar mı, bilen yok.</p>
+  </div>
+</div></section>
+
+<div class="wrap" id="ozellikler">
+{rows}
+</div>
+
+<section class="block mist"><div class="wrap">
+  <div class="head"><h2>Ayrıca</h2></div>
+  <div class="extras">{extras}</div>
+</div></section>
+
+<section class="block"><div class="wrap narrow">
+  <h2>Neden ücretsiz?</h2>
+  <p>Bungalov Dünyası, Sapanca'daki bungalovları misafirle komisyonsuz buluşturmaya çalışan bir rehber. Rehbere katılan tesislerin işini kolaylaştırmak bizim de işimize yarıyor: düzenli çalışan tesis, memnun misafir demek. Uygulamayı da bu yüzden rehberdeki tesislere ücretsiz veriyoruz.</p>
+  <p class="disclose">Açıklık notu: Uygulamayı geliştiren ve Bungalov Dünyası'nı hazırlayan ekip, Sapanca'da Labella Bungalov'u işletiyor. Ekran görüntüleri örnek verilerle hazırlandı; gerçek misafir bilgisi içermez.</p>
+  <h2>Sık sorulanlar</h2>
+  {faq}
+</div></section>
+
+<section class="band"><div class="wrap">
+  <div><h2>Tesisinizde deneyelim</h2><p>Tesisinizin adını ve bungalov sayısını yazın. Kurulumu birlikte yapalım, ilk rezervasyonları beraber girelim.</p></div>
+  <div class="actions"><a class="btn ember" href="{msg}" rel="noopener">WhatsApp'tan yazın</a><a class="btn ghost-light" href="/tesis-ekle/">Rehbere katılım</a></div>
+</div></section>
+"""
+    schema = [{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Bungalov Yönetim",
+               "applicationCategory": "BusinessApplication", "operatingSystem": "Windows, Android, iOS, iPadOS",
+               "description": "Bungalov işletmecileri için rezervasyon takvimi, kapora takibi, WhatsApp mesajları, fiyat ve gelir-gider yönetimi.",
+               "offers": {"@type": "Offer", "price": "0", "priceCurrency": "TRY"},
+               "screenshot": [SITE + "/img/uygulama/" + n + ".webp" for n, *_ in APP_FEATURES],
+               "publisher": {"@type": "Organization", "name": NAME, "url": SITE + "/"}},
+              {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+                  {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in APP_FAQ]},
+              crumbs_ld([("/uygulama/", "Bungalov Yönetim")])]
+    write("/uygulama/", page("/uygulama/", "Bungalov Yönetim: Bungalov İşletmecileri İçin Ücretsiz Rezervasyon Uygulaması",
+                             "Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları, bayram fiyatları ve gelir-gider tek uygulamada. Bungalov Dünyası'ndaki tesislere ücretsiz.",
+                             body, schema, active="/uygulama/", og_image=SITE + "/img/uygulama/takvim.webp"))
 
 
 def build_about():
@@ -484,7 +601,7 @@ def build_404():
 def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
     urls = [("/", newest), ("/tesisler/", "2026-10-13"), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
-        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [("/tesis-ekle/", "2026-10-13"), ("/hakkimizda/", "2026-10-13")]
+        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [("/tesis-ekle/", "2026-10-13"), ("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13")]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
@@ -494,12 +611,13 @@ def build_meta():
     fav = LOGO_SVG.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"').replace("currentColor", "#15302b")
     write("/favicon.svg", fav)
     shutil.copy(os.path.join(os.path.dirname(OUT), "src", "style.css"), os.path.join(OUT, "style.css"))
+    shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "img"), os.path.join(OUT, "img"))
 
 
 if __name__ == "__main__":
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
-    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_about(); build_404(); build_meta()
+    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404(); build_meta()
     n = sum(len(fs) for _, _, fs in os.walk(OUT))
     print(f"{n} dosya → {OUT}")
