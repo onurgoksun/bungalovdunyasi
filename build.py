@@ -32,6 +32,10 @@ PHOTOS = {
     "dog": ("https://images.unsplash.com/photo-1642387922923-cf4cacf42ae9", "Şöminenin önünde uzanan köpek", "Djordje Vukojicic", "51Fin-fJTNk"),
     "lake": ("https://images.unsplash.com/photo-1496060169243-453fde45943b", "Göl kıyısında sisli orman", "Sam Ferrara", "iecJiKe_RNg"),
     "inside": ("https://images.unsplash.com/photo-1631941392209-70cad44ecfb7", "Şömineli ahşap bungalov iç mekânı", "Hans", "_k0Pyd1uMEc"),
+    "forestlake": ("https://images.unsplash.com/photo-1623681193221-261b6578180e", "Ağaçların arasından görünen göl", "Ruben Hanssen", "ODAKeAbL2tc"),
+    "firepit": ("https://images.unsplash.com/photo-1782226796423-8d72656a332c", "Akşam ışıklı ahşap bungalov ve ateş çukuru", "Jonathan Adams", "wcpofj_J3mc"),
+    "stars": ("https://images.unsplash.com/photo-1761674255792-1e75af5ccf33", "Yıldızlı gecede ışıkları yanan A-frame bungalov", "Jimy Antoun", "KP2j49M3rZU"),
+    "fireplace": ("https://images.unsplash.com/photo-1696860740767-f4211c9209f4", "Taş şömineli geniş oturma odası", "Clay Banks", "Qry84CsaA9o"),
 }
 
 
@@ -186,157 +190,21 @@ SLOT = f"""<div class="slot">
 
 # ---------------------------------------------------------------- Rehber yazıları
 GUIDES = []
-
-
-GUIDE_IMG = {"sapanca-bungalov-kiralamadan-once-sorulacak-sorular": "pool", "kisin-sapanca-bungalov-isitmali-havuz-jakuzi-somine": "snow", "evcil-hayvanla-sapanca-bungalov": "dog"}
-
-
-def guide(slug, title, seo_title, desc, minutes, body, faq=None):
-    GUIDES.append(dict(slug=slug, title=title, seo_title=seo_title, desc=desc, minutes=minutes, body=body, faq=faq or [], img=GUIDE_IMG[slug]))
-
-
-ASK_MSG = ("Merhaba, Bungalov Dünyası'ndan ulaşıyorum. [giriş tarihi] – [çıkış tarihi] arası [kişi sayısı] kişi için "
-           "müsaitliğinizi öğrenmek istiyorum. Havuz ısıtmalı mı, jakuzi sıcak mı ve fiyata neler dahil?")
-
-guide(
-    "sapanca-bungalov-kiralamadan-once-sorulacak-sorular",
-    "Sapanca'da bungalov kiralamadan önce sorulacak 12 soru",
-    "Sapanca'da Bungalov Kiralamadan Önce Sorulacak 12 Soru",
-    "Havuz gerçekten özel mi, ısıtmalı mı, jakuzi sıcak mı, iptal koşulları ne? Sapanca'da bungalov kiralamadan önce tesise sormanız gereken 12 soru.",
-    6,
-    f"""
-<p>Fotoğraflar birbirine benziyor: ahşap bir A-frame, önünde mavi bir havuz, gece yanan ışıklar. Farkı ilanın küçük harflerinde ya da hiç yazılmayan ayrıntılarda bulursunuz. Aşağıdaki sorular, rezervasyon yapmadan önce tesisle beş dakikalık bir yazışmada netleştirmeniz gerekenler.</p>
-
-<h2>Havuz ve jakuzi</h2>
-<ul class="checklist">
-<li><strong>Havuz bungalova özel mi, ortak mı?</strong> "Havuzlu bungalov" ilanlarının bir kısmında havuz birkaç bungalov arasında ortaktır. Özel havuzda alanı yalnızca sizin grubunuz kullanır.</li>
-<li><strong>Havuz ısıtmalı mı, hangi aylarda?</strong> Isıtmalı havuz ilkbahar ve sonbaharda büyük fark yaratır. Isıtmanın hangi aylarda çalıştığını, ek ücret olup olmadığını ve suyun yaklaşık kaç derecede tutulduğunu sorun.</li>
-<li><strong>Jakuzi içeride mi, dışarıda mı, sıcak mı?</strong> Banyodaki jakuzili küvet ile açık havadaki sıcak jakuzi çok farklı deneyimlerdir. Dış jakuzinin kışın da sıcak çalışıp çalışmadığını öğrenin.</li>
-</ul>
-
-<h2>Bungalovun kendisi</h2>
-<ul class="checklist">
-<li><strong>Kaç kişi kalabiliyor, yatak düzeni nasıl?</strong> "4+1" genellikle dört yetişkin ve bir ek yatak ya da çocuk anlamına gelir. Yatakların çift kişilik mi, tek kişilik mi olduğunu sorun.</li>
-<li><strong>Mutfakta neler var?</strong> Ocak, buzdolabı, tencere-tava, çay ve kahve makinesi gibi temel donanımı kontrol edin. Kendi yemeğinizi yapacaksanız bu soru önemlidir.</li>
-<li><strong>Şömine var mı, odun dahil mi?</strong> Odunlu şöminede odunun fiyata dahil olup olmadığını, şöminesi olmayan bungalovlarda ise ısınmanın nasıl sağlandığını sorun.</li>
-<li><strong>Giriş ve çıkış saatleri ne?</strong> Sapanca'da giriş genellikle öğleden sonra, çıkış öğleden önce yapılır. Erken giriş ya da geç çıkış mümkünse önceden konuşun.</li>
-</ul>
-
-<h2>Kurallar ve ödeme</h2>
-<ul class="checklist">
-<li><strong>Evcil hayvan kabul ediliyor mu?</strong> Kabul eden tesisler genellikle boyut ve sayı sınırı koyar, bazıları ek temizlik ücreti alır. Ayrıntılar için <a href="/rehber/evcil-hayvanla-sapanca-bungalov/">evcil hayvanla bungalov rehberine</a> bakabilirsiniz.</li>
-<li><strong>Kapora ve iptal koşulları neler?</strong> Kaporanın ne kadar olduğunu, iptal ederseniz kaç gün öncesine kadar iade edildiğini ve tarih değişikliğinin mümkün olup olmadığını yazılı olarak alın.</li>
-<li><strong>Mangal ve ateş çukuru kullanılabiliyor mu?</strong> Mangal malzemesi, kömür ve ızgaranın tesis tarafından sağlanıp sağlanmadığını sorun.</li>
-</ul>
-
-<h2>Konum ve ulaşım</h2>
-<ul class="checklist">
-<li><strong>Bungalovlar arasında mesafe ne kadar?</strong> Gizlilik sizin için önemliyse komşu bungalovun terasından havuzunuzun görünüp görünmediğini sorun, mümkünse genel görünüm fotoğrafı isteyin.</li>
-<li><strong>Otopark ve yol durumu nasıl?</strong> Aracınızı bungalova yakın park edebilecek misiniz? Kışın tesis yolunun karda nasıl olduğunu öğrenin.</li>
-</ul>
-
-<h2>Hazır mesaj</h2>
-<p>Tesise WhatsApp'tan şu mesajı tarihlerinizi doldurarak gönderebilirsiniz:</p>
-<div class="note"><p>{esc(ASK_MSG)}</p></div>
-
-<h2>Doğrudan tesisle konuşmak</h2>
-<p>Büyük rezervasyon sitelerinde tesis, her rezervasyon için komisyon öder. Doğrudan iletişimde bu maliyet olmadığı için birçok tesis tarih değişikliği, erken giriş ya da uzun konaklama gibi konularda daha esnek davranabilir. Bu rehberdeki tesislerin hepsiyle doğrudan iletişim kurabilirsiniz.</p>
-""",
-    faq=[("Sapanca'da bungalov havuzu özel mi oluyor?",
-          "Tesise göre değişir. Bazı tesislerde her bungalovun kendine ait havuzu vardır, bazılarında havuz birkaç bungalov arasında ortaktır. Rezervasyondan önce havuzun bungalova özel olup olmadığını sorun."),
-         ("Bungalovda 4+1 ne demek?",
-          "Genellikle dört yetişkin ve bir ek yatak ya da çocuk için yer olduğu anlamına gelir. Yatak düzenini tesise ayrıca sorun.")])
-
-guide(
-    "kisin-sapanca-bungalov-isitmali-havuz-jakuzi-somine",
-    "Kışın Sapanca'da bungalov: ısıtmalı havuz, jakuzi ve şömine",
-    "Kışın Sapanca'da Bungalov: Isıtmalı Havuz, Jakuzi ve Şömine Rehberi",
-    "Sapanca'da kış tatili için bungalov seçerken ısıtmalı havuz, sıcak jakuzi, şömine ve ulaşım konusunda bilmeniz gerekenler.",
-    5,
-    """
-<p>Sapanca'yı yazın göl kenarı için seçenler kadar, kışın şömine başında birkaç gün geçirmek için gelenler de çok. Kış tatilinde bungalovu yaz tatilinden farklı kriterlerle seçmek gerekir: havuzun mavisi değil, suyun sıcaklığı ve içerinin ne kadar çabuk ısındığı önemlidir.</p>
-
-<h2>Sapanca'da kış nasıl geçer?</h2>
-<p>Sapanca'da kışlar genellikle serin ve yağışlı geçer. Yüksek kesimlerde ve hemen yanındaki Kartepe'de kar sık görülür. Yani ateşin başında oturup dışarıda yağan karı izlemek mümkün, ama yolda da hazırlıklı olmak gerekir.</p>
-
-<h2>Isıtmalı havuz: neyi sormalı?</h2>
-<p>"Isıtmalı havuz" ifadesi tesisten tesise farklı şeyler anlatabilir. Kışın gidecekseniz şunları netleştirin:</p>
-<ul>
-<li>Isıtma kış aylarında da çalışıyor mu, yoksa sadece ilkbahar ve sonbaharda mı?</li>
-<li>Su yaklaşık kaç dereceye kadar ısıtılıyor?</li>
-<li>Isıtma fiyata dahil mi, ek ücretli mi?</li>
-<li>Havuz açık mı, üstü kapalı mı? Açık havuzda havuzdan çıkıp içeri girene kadar geçen yol kısa olmalı.</li>
-</ul>
-
-<h2>Sıcak jakuzi</h2>
-<p>Kışın en çok aranan özellik açık havada sıcak jakuzidir. Soğuk havada sıcak suyun içinde oturmak, ısıtmalı havuzdan bile daha keyifli olabilir. Jakuzinin terasta mı, banyoda mı olduğunu ve kullanmadan ne kadar önce ısıtılması gerektiğini sorun.</p>
-
-<h2>Şömine ve ısınma</h2>
-<ul>
-<li><strong>Şömine:</strong> Odunlu şömine atmosfer yaratır. Odunun fiyata dahil olup olmadığını ve yeterli odun bırakılıp bırakılmadığını öğrenin.</li>
-<li><strong>Asıl ısınma:</strong> Şömine çoğu zaman ek ısıtıcıdır. Bungalovun klima, kombi ya da yerden ısıtmayla ısınıp ısınmadığını sorun; A-frame yapılarda yüksek tavan nedeniyle bu daha da önemlidir.</li>
-</ul>
-
-<h2>Ulaşım</h2>
-<p>Kar yağdığında tesise giden yol rampalıysa zorlaşabilir. Yola çıkmadan önce tesisi arayıp yol durumunu sorun, aracınızda kış lastiği olduğundan emin olun.</p>
-
-<h2>Kışın çevrede ne yapılır?</h2>
-<ul>
-<li><strong>Kartepe:</strong> Kayak ve kar keyfi için günübirlik gidilebilecek en yakın yer.</li>
-<li><strong>Maşukiye:</strong> Şelaleleri, dere kenarındaki alabalık restoranları ve yürüyüş yollarıyla bilinir.</li>
-<li><strong>Göl kenarı:</strong> Soğuk ama güneşli bir günde Sapanca Gölü kıyısında yürümek, kalabalık yaz günlerinden çok daha sakindir.</li>
-</ul>
-
-<div class="note warm"><p>Isıtmalı havuz, sıcak jakuzi ve şöminenin üçü birden olan bungalovlar kış hafta sonlarında erken doluyor. Tarihiniz belliyse birkaç hafta önceden sormanızı öneririz.</p></div>
-""",
-    faq=[("Sapanca'da kışın havuza girilir mi?",
-          "Havuz ısıtmalıysa ve ısıtma kış aylarında da çalışıyorsa girilebilir. Isıtmanın hangi aylarda çalıştığını ve suyun kaç dereceye kadar ısıtıldığını tesise sorun."),
-         ("Kışın Sapanca'ya ulaşım zor mu?",
-          "Ana yollar genellikle açıktır, ancak kar yağdığında tesislere giden rampalı yollar zorlaşabilir. Yola çıkmadan önce tesisten yol durumunu öğrenin ve kış lastiği kullanın.")])
-
-guide(
-    "evcil-hayvanla-sapanca-bungalov",
-    "Evcil hayvanla Sapanca'da bungalov tatili",
-    "Evcil Hayvanla Sapanca'da Bungalov Tatili: Bilmeniz Gerekenler",
-    "Köpeğiniz ya da kedinizle Sapanca'da bungalov tatili planlıyorsanız tesise sormanız gerekenler, yanınıza almanız gerekenler ve bungalov kuralları.",
-    4,
-    """
-<p>Bungalov, evcil hayvanla tatil için otelden çok daha uygundur: kendi girişiniz, bahçeniz ve terasınız vardır, koridorda başka misafirle karşılaşmazsınız. Ama her tesis evcil hayvan kabul etmez, kabul edenlerin de kuralları farklıdır.</p>
-
-<h2>Rezervasyondan önce sorun</h2>
-<ul>
-<li>Evcil hayvan kabul ediliyor mu? İlanda yazmıyorsa mutlaka sorun.</li>
-<li>Boyut, cins ya da sayı sınırı var mı?</li>
-<li>Ek temizlik ücreti ya da depozito alınıyor mu?</li>
-<li>Bahçe çitle çevrili mi? Köpeğiniz serbest dolaşacaksa bu önemli.</li>
-</ul>
-
-<h2>Bungalov içinde genel kurallar</h2>
-<ul>
-<li><strong>Havuz:</strong> Hijyen nedeniyle çoğu tesis hayvanların havuza girmesine izin vermez. Havuz kenarında dikkatli olun.</li>
-<li><strong>Yatak ve koltuk:</strong> Kendi battaniyenizi getirin, hayvanınızı yatak ve koltuklara çıkarmayın.</li>
-<li><strong>Yalnız bırakmak:</strong> Bungalovda yalnız bırakmanın uygun olup olmadığını tesise sorun.</li>
-<li><strong>Bahçe:</strong> Tuvalet ihtiyacını bahçede karşılıyorsa mutlaka toplayın.</li>
-</ul>
-
-<h2>Yanınıza alın</h2>
-<ul>
-<li>Mama, mama ve su kabı</li>
-<li>Tasma, gezdirme kayışı ve tanıdık bir oyuncak</li>
-<li>Yatağı ya da battaniyesi</li>
-<li>Dışkı poşetleri ve havlu</li>
-<li>Aşı karnesi ve varsa düzenli kullandığı ilaçları</li>
-</ul>
-
-<h2>Yolda ve çevrede</h2>
-<p>İstanbul'dan Sapanca'ya yolculuk trafiğe göre birkaç saat sürebilir. Arada mola verin, su verin. Göl kenarı ve orman yolları yürüyüş için güzeldir. Kalabalık alanlarda ve köy yollarında tasmayı çıkarmayın.</p>
-
-<div class="note"><p>Evcil hayvanla geleceğinizi rezervasyon sırasında mutlaka belirtin. Haber vermeden gelmek hem tesisle hem diğer misafirlerle sorun yaşatabilir.</p></div>
-""",
-    faq=[("Sapanca'da evcil hayvan kabul eden bungalov var mı?",
-          "Evet, bazı tesisler evcil hayvan kabul ediyor. Genellikle boyut ve sayı sınırı ya da ek temizlik ücreti uygulanır. Rezervasyondan önce tesise sorun."),
-         ("Köpeğim havuza girebilir mi?",
-          "Çoğu tesis hijyen nedeniyle hayvanların havuza girmesine izin vermez. Kuralı tesise önceden sorun.")])
+CONTENT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "content", "rehber")
+# Rehber yazıları content/rehber/*.json dosyalarından okunur (en yeni en üstte).
+for _fn in sorted(os.listdir(CONTENT)):
+    if not _fn.endswith(".json"):
+        continue
+    with open(os.path.join(CONTENT, _fn), encoding="utf-8") as _f:
+        _d = json.load(_f)
+    if _d.get("draft"):
+        continue
+    if _d["image"] not in PHOTOS:
+        raise SystemExit(f"{_fn}: bilinmeyen görsel anahtarı {_d['image']!r} (PHOTOS içinden seçin)")
+    GUIDES.append(dict(slug=_d["slug"], title=_d["title"], seo_title=_d["seo_title"], desc=_d["description"],
+                       minutes=_d["minutes"], body=_d["body"], img=_d["image"], date=_d["date"],
+                       faq=[(x["q"], x["a"]) for x in _d.get("faq", [])]))
+GUIDES.sort(key=lambda g: (g["date"], g["slug"]), reverse=True)
 
 
 # ---------------------------------------------------------------- Sayfalar
@@ -523,7 +391,7 @@ def build_guides():
 </div>
 """
         schema = [{"@context": "https://schema.org", "@type": "Article", "headline": g["title"], "description": g["desc"],
-                   "inLanguage": "tr", "image": ux(g["img"], 1200, 630), "datePublished": TODAY, "dateModified": TODAY, "mainEntityOfPage": SITE + path,
+                   "inLanguage": "tr", "image": ux(g["img"], 1200, 630), "datePublished": g["date"], "dateModified": g["date"], "mainEntityOfPage": SITE + path,
                    "author": {"@type": "Organization", "name": NAME, "url": SITE + "/"},
                    "publisher": {"@type": "Organization", "name": NAME, "url": SITE + "/"}},
                   crumbs_ld([("/rehber/", "Rehber"), (path, g["title"])])]
@@ -614,9 +482,11 @@ def build_404():
 
 
 def build_meta():
-    urls = ["/", "/tesisler/", "/tesisler/labella-bungalov/", "/rehber/"] + [f'/rehber/{g["slug"]}/' for g in GUIDES] + ["/tesis-ekle/", "/hakkimizda/"]
+    newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
+    urls = [("/", newest), ("/tesisler/", "2026-10-13"), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
+        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [("/tesis-ekle/", "2026-10-13"), ("/hakkimizda/", "2026-10-13")]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod></url>\n" for u in urls) + "</urlset>\n"
+    sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
     write("/robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
     write("/CNAME", "bungalovdunyasi.tr\n")
