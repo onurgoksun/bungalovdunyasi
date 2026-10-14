@@ -107,6 +107,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
   </div>
   <p class="small">© {datetime.date.today().year} {NAME}. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
 </div></footer>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{{"token": "e4d1630b9947485b835f8b18c6dd0d75"}}'></script>
 </body>
 </html>
 """
