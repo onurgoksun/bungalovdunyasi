@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=9aae150b">
+<link rel="stylesheet" href="/style.css?v=1656ffa3">
 <link rel="preconnect" href="https://images.unsplash.com">
 </head>
 <body>
@@ -73,9 +73,11 @@
 <section class="fsec">
   <h2><span>5</span> Adres ve konum</h2>
   <div class="grid3">
-    <label class="fld" for="f-district"><span>İlçe</span><select id="f-district"><option>Sapanca</option><option>Kartepe</option><option>Serdivan</option><option>Diğer</option></select></label>
+    <label class="fld" for="f-province"><span>İl</span><select id="f-province"><option value="">İl seçin</option></select></label>
+    <label class="fld" for="f-district"><span>İlçe</span><input id="f-district" type="text" maxlength="40" list="ilceler" autocomplete="off" placeholder="ör. Sapanca"></label>
     <label class="fld" for="f-neighborhood"><span>Mahalle / köy</span><input id="f-neighborhood" type="text" maxlength="80" placeholder="ör. Kırkpınar"></label>
   </div>
+  <datalist id="ilceler"></datalist>
   <label class="fld wide" for="f-address"><span>Açık adres</span><input id="f-address" type="text" maxlength="300" placeholder="Sokak, numara"></label>
   <div class="map-prev"><iframe id="map-frame" title="Harita önizlemesi" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden></iframe><p id="map-empty">Adresi yazdığınızda harita burada görünür.</p></div>
   <p class="hint">Harita yanlış yeri gösteriyorsa adrese mahalle ya da köy adını ekleyin. <a id="map-link" href="https://www.google.com/maps" target="_blank" rel="noopener">Google Haritalar'da aç</a></p>
@@ -120,7 +122,7 @@
 <footer class="foot"><div class="wrap">
   <div>
     <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
-    <p>Sapanca ve çevresinde bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
+    <p>Türkiye'de bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
   </div>
   <div>
     <h4>Sayfalar</h4>
@@ -133,9 +135,10 @@
   <p class="small">© 2026 Bungalov Dünyası. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
 </div></footer>
 <script>try{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}catch(e){}</script>
+<script src="/js/iller.js?v=d367fc04"></script>
 <script src="/js/vendor/supabase-2.117.0.js"></script>
-<script src="/js/core.js?v=a393a072"></script>
-<script src="/js/tesis-form.js?v=a393a072"></script>
+<script src="/js/core.js?v=d367fc04"></script>
+<script src="/js/tesis-form.js?v=d367fc04"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e4d1630b9947485b835f8b18c6dd0d75"}'></script>
 </body>
 </html>

@@ -16,7 +16,7 @@
     AMENITIES: ["Özel havuz", "Isıtmalı havuz", "Ortak havuz", "Açık hava jakuzisi", "İç mekân jakuzisi", "Şömine",
       "Tam donanımlı mutfak", "Klima", "Yerden ısıtma", "Wi-Fi", "Smart TV", "Mangal / barbekü", "Ateş çukuru",
       "Bahçe", "Göl manzarası", "Orman manzarası", "Özel otopark", "Kahvaltı imkânı", "Çocuklara uygun", "Engelli erişimine uygun"],
-    DISTRICTS: ["Sapanca", "Kartepe", "Serdivan", "Diğer"],
+    GEO: window.BD_ILLER || { iller: [], populer: {} },
     PETS: { evet: "Evcil hayvan kabul edilir", hayir: "Evcil hayvan kabul edilmez", sor: "Evcil hayvan için önceden sorun" }
   };
 
@@ -58,8 +58,10 @@
   BD.mapSrc = function (q) { return "https://maps.google.com/maps?q=" + encodeURIComponent(q) + "&z=14&output=embed"; };
   BD.mapLink = function (q) { return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q); };
   BD.fullAddress = function (l) {
-    return [l.address, l.neighborhood, l.district, "Sakarya"].filter(function (x) { return x && String(x).trim(); }).join(", ");
+    return [l.address, l.neighborhood, l.district, l.province].filter(function (x) { return x && String(x).trim(); }).join(", ");
   };
+
+  BD.place = function (l) { return [l.neighborhood, l.district, l.province].filter(function (x) { return x && String(x).trim(); }).join(", "); };
 
   BD.session = async function () {
     var r = await sb.auth.getSession();

@@ -15,6 +15,7 @@
     $("#form-yukleniyor").hidden = true;
     if (p.kind !== "kurumsal") { $("#kisisel-uyari").hidden = false; return; }
     buildAmenities();
+    buildGeo();
     $("#tesis-form").hidden = false;
     var id = BD.qs("id");
     if (id) {
@@ -38,6 +39,18 @@
     updateMap(); counters();
   })();
 
+  function buildGeo() {
+    var sel = $("#f-province");
+    BD.GEO.iller.forEach(function (il) { sel.appendChild(el("option", { value: il, text: il })); });
+    sel.addEventListener("change", suggest);
+    suggest();
+  }
+  function suggest() {
+    var dl = $("#ilceler");
+    dl.textContent = "";
+    (BD.GEO.populer[$("#f-province").value] || []).forEach(function (x) { dl.appendChild(el("option", { value: x })); });
+  }
+
   function buildAmenities() {
     var box = $("#amenities");
     BD.AMENITIES.forEach(function (a, i) {
@@ -45,12 +58,13 @@
     });
   }
 
-  var FIELDS = ["name", "summary", "description", "district", "neighborhood", "address", "units", "capacity", "beds", "pets",
+  var FIELDS = ["name", "summary", "description", "province", "district", "neighborhood", "address", "units", "capacity", "beds", "pets",
     "checkin", "checkout", "rules", "phone", "whatsapp", "website", "booking_url", "instagram"];
 
   function fill(l) {
     FIELDS.forEach(function (k) { var i = $("#f-" + k.replace("_", "-")); if (i) i.value = l[k] == null ? "" : l[k]; });
     $$("#amenities input").forEach(function (c) { c.checked = (l.amenities || []).indexOf(c.value) >= 0; });
+    suggest();
     photos = (l.photos || []).slice();
     renderPhotos();
   }
@@ -72,15 +86,15 @@
   function updateMap() {
     clearTimeout(mapTimer);
     mapTimer = setTimeout(function () {
-      var q = BD.fullAddress({ address: $("#f-address").value, neighborhood: $("#f-neighborhood").value, district: $("#f-district").value });
+      var q = BD.fullAddress({ address: $("#f-address").value, neighborhood: $("#f-neighborhood").value, district: $("#f-district").value, province: $("#f-province").value });
       var frame = $("#map-frame");
-      if (!$("#f-address").value.trim() && !$("#f-neighborhood").value.trim()) { frame.hidden = true; $("#map-empty").hidden = false; return; }
+      if (!$("#f-address").value.trim() && !$("#f-neighborhood").value.trim() && !$("#f-district").value.trim()) { frame.hidden = true; $("#map-empty").hidden = false; return; }
       frame.hidden = false; $("#map-empty").hidden = true;
       if (frame.dataset.q !== q) { frame.dataset.q = q; frame.src = BD.mapSrc(q); }
       $("#map-link").href = BD.mapLink(q);
     }, 600);
   }
-  ["#f-address", "#f-neighborhood", "#f-district"].forEach(function (s) { $(s).addEventListener("input", updateMap); $(s).addEventListener("change", updateMap); });
+  ["#f-address", "#f-neighborhood", "#f-district", "#f-province"].forEach(function (s) { $(s).addEventListener("input", updateMap); $(s).addEventListener("change", updateMap); });
 
   // ---------------------------------------------------------------- Karakter sayaçları
   function counters() {
@@ -179,6 +193,7 @@
     BD.msg(msg, "");
     var o = collect();
     if (o.name.length < 2) return BD.msg(msg, "Tesis adını yazın.", "bad");
+    if (!o.province || !o.district) return BD.msg(msg, "Tesisin bulunduğu ili ve ilçeyi seçin.", "bad");
     if (!o.phone && !o.whatsapp) return BD.msg(msg, "Misafirlerin size ulaşabilmesi için telefon ya da WhatsApp numarası girin.", "bad");
     if (!photos.length) return BD.msg(msg, "En az bir fotoğraf ekleyin.", "bad");
     if (!$("#f-onay").checked) return BD.msg(msg, "Bilgilerin ve fotoğrafların doğru ve size ait olduğunu onaylayın.", "bad");

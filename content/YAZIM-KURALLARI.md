@@ -4,9 +4,12 @@ Bu dosya, rehber yazılarını yazan kişi ya da otomatik görev içindir.
 
 ## Dosya
 - Her yazı `content/rehber/<slug>.json` dosyasıdır. Örnek için mevcut üç dosyaya bakın.
-- Alanlar: `slug`, `title` (sayfa başlığı, cümle düzeninde), `seo_title` (60 karakteri geçmesin, " | Bungalov Dünyası" otomatik eklenir), `description` (140-160 karakter), `minutes` (okuma süresi, ~200 kelime/dk), `image` (build.py içindeki PHOTOS anahtarlarından biri), `date` (YYYY-MM-DD, yayın günü), `body` (HTML), `faq` (2-3 adet `{"q","a"}`).
+- Alanlar: `slug`, `title` (sayfa başlığı, cümle düzeninde), `seo_title` (60 karakteri geçmesin, " | Bungalov Dünyası" otomatik eklenir), `description` (140-160 karakter), `minutes` (okuma süresi, ~200 kelime/dk), `image` (build.py içindeki PHOTOS anahtarlarından biri), `date` (YYYY-MM-DD, yayın günü), `body` (HTML), `faq` (2-3 adet `{"q","a"}`). İsteğe bağlı `bolge`: yazı belirli bir ilçeyle ilgiliyse `il-slug/ilce-slug` (ör. `sakarya/sapanca`, `istanbul/sile`); verilmezse `sakarya/sapanca` sayılır. Genel (bölgeden bağımsız) yazılarda `"bolge": "genel"` yazın. Yazı, o bölgenin sayfasında (`/bolge/<il>/<ilçe>/`) listelenir.
 - `body` içinde yalnızca şu etiketler: `p`, `h2`, `h3`, `ul`, `ol`, `li`, `strong`, `a`, `div class="note"`, `div class="note warm"`, `ul class="checklist"`. `h1` kullanmayın (başlık otomatik).
-- İç bağlantılar `/rehber/<slug>/`, `/tesisler/labella-bungalov/`, `/tesis-ekle/` biçiminde. En az bir ilgili rehber yazısına bağlantı verin.
+- İç bağlantılar `/rehber/<slug>/`, `/tesisler/labella-bungalov/`, `/bolge/sakarya/sapanca/`, `/tesis-ekle/` biçiminde. En az bir ilgili rehber yazısına bağlantı verin.
+
+## Kapsam
+- Site Türkiye genelindeki bungalov tesislerini kapsar; ilk ve en ayrıntılı bölge Sapanca. Başka bölgeler hakkında yazarken de aynı doğruluk kurallarına uyun.
 
 ## Dil ve ton
 - Türkçe, sade, samimi ama abartısız. "Siz" diye hitap edin.

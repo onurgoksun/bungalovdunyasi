@@ -7,7 +7,7 @@
   var known = {};
   $$("[data-slug]").forEach(function (e) { known[e.dataset.slug] = 1; });
 
-  sb.from("listings").select("slug,name,summary,district,neighborhood,amenities,pets,photos")
+  sb.from("listings").select("slug,name,summary,province,district,neighborhood,amenities,pets,photos")
     .eq("status", "yayinda").order("created_at", { ascending: false }).limit(200)
     .then(function (r) {
       if (r.error || !r.data) return;
@@ -27,7 +27,7 @@
       shots,
       el("div", {}, [
         el("h3", {}, [el("a", { href: url, text: l.name })]),
-        el("p", { class: "place", text: [l.neighborhood, l.district].filter(Boolean).join(", ") }),
+        el("p", { class: "place", text: BD.place(l) }),
         l.summary ? el("p", { text: l.summary }) : null,
         tags.length ? el("ul", { class: "tags", "aria-label": "Öne çıkan olanaklar" }, tags) : null,
         el("div", { class: "actions" }, [el("a", { class: "btn solid", href: url, text: "Tesisi incele" })])

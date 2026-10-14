@@ -37,7 +37,7 @@
 
   async function loadListings(uid) {
     var box = $("#tesislerim");
-    var r = await sb.from("listings").select("id,slug,name,status,district,neighborhood,photos,updated_at,removed_reason").eq("owner", uid).order("updated_at", { ascending: false });
+    var r = await sb.from("listings").select("id,slug,name,status,province,district,neighborhood,photos,updated_at,removed_reason").eq("owner", uid).order("updated_at", { ascending: false });
     box.textContent = "";
     if (r.error) return BD.msg(msg, BD.err(r.error), "bad");
     if (!r.data.length) {
@@ -53,7 +53,7 @@
         cover ? el("img", { src: BD.photoUrl(cover.path), alt: "", loading: "lazy" }) : el("div", { class: "ph" }),
         el("div", { class: "my-main" }, [
           el("h3", { text: l.name }),
-          el("p", { class: "place", text: [l.neighborhood, l.district].filter(Boolean).join(", ") }),
+          el("p", { class: "place", text: BD.place(l) }),
           el("span", { class: "pill " + st[1], text: st[0] }),
           l.status === "kaldirildi" && l.removed_reason ? el("p", { class: "small bad", text: "Sebep: " + l.removed_reason }) : null
         ]),
@@ -75,7 +75,7 @@
 
   async function loadFavorites() {
     var box = $("#favorilerim");
-    var r = await sb.from("favorites").select("listing_id, listings(id,slug,name,district,neighborhood,photos,status)").order("created_at", { ascending: false });
+    var r = await sb.from("favorites").select("listing_id, listings(id,slug,name,province,district,neighborhood,photos,status)").order("created_at", { ascending: false });
     box.textContent = "";
     if (r.error) return BD.msg(msg, BD.err(r.error), "bad");
     var items = r.data.filter(function (f) { return f.listings && f.listings.status === "yayinda"; });
@@ -89,7 +89,7 @@
       var l = f.listings, cover = (l.photos || [])[0];
       box.appendChild(el("article", { class: "my-row" }, [
         cover ? el("img", { src: BD.photoUrl(cover.path), alt: "", loading: "lazy" }) : el("div", { class: "ph" }),
-        el("div", { class: "my-main" }, [el("h3", { text: l.name }), el("p", { class: "place", text: [l.neighborhood, l.district].filter(Boolean).join(", ") })]),
+        el("div", { class: "my-main" }, [el("h3", { text: l.name }), el("p", { class: "place", text: BD.place(l) })]),
         el("div", { class: "my-actions" }, [
           el("a", { class: "btn solid sm", href: "/tesis/?t=" + encodeURIComponent(l.slug), text: "Görüntüle" }),
           el("button", { class: "btn line sm", type: "button", text: "Favorilerden çıkar", onclick: async function () {

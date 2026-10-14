@@ -13,7 +13,7 @@
     var l = r.data;
     var s = await BD.session();
     var mine = s && s.user.id === l.owner;
-    document.title = l.name + " – " + [l.neighborhood, l.district].filter(Boolean).join(", ") + " Bungalov | Bungalov Dünyası";
+    document.title = l.name + " – " + [l.district, l.province].filter(Boolean).join(", ") + " Bungalov | Bungalov Dünyası";
     var md = document.querySelector('meta[name="description"]');
     if (md) md.setAttribute("content", (l.summary || l.name).slice(0, 160));
     render(l, s, mine);
@@ -39,7 +39,7 @@
 
   function render(l, s, mine) {
     root.hidden = false;
-    var place = [l.neighborhood, l.district].filter(Boolean).join(", ");
+    var place = BD.place(l);
     var photos = l.photos || [];
 
     if (BD.qs("yeni") && mine) {

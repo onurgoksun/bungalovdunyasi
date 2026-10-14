@@ -68,7 +68,7 @@ def _hash(*paths):
     return h.hexdigest()[:8]
 
 
-JSV = _hash("src/js")      # dosya değişince tarayıcı önbelleği yenilenir
+JSV = _hash("src/js", "src/iller.json")      # dosya değişince tarayıcı önbelleği yenilenir
 CSSV = _hash("src/style.css")
 SB_JS = "/js/vendor/supabase-2.117.0.js"
 
@@ -77,7 +77,8 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
     canonical = SITE + path
     js = ""
     if scripts:
-        js = f'<script src="{SB_JS}"></script>\n<script src="/js/core.js?v={JSV}"></script>\n' + \
+        geo = f'<script src="/js/iller.js?v={JSV}"></script>\n' if "tesis-form" in scripts else ""
+        js = geo + f'<script src="{SB_JS}"></script>\n<script src="/js/core.js?v={JSV}"></script>\n' + \
             "".join(f'<script src="/js/{n}.js?v={JSV}"></script>\n' for n in scripts)
     robots = '<meta name="robots" content="noindex">\n' if noindex else ""
     nav = "".join(
@@ -121,7 +122,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <footer class="foot"><div class="wrap">
   <div>
     <a class="logo" href="/">{LOGO_SVG}{NAME}</a>
-    <p>Sapanca ve çevresinde bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
+    <p>Türkiye'de bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
   </div>
   <div>
     <h4>Sayfalar</h4>
@@ -166,7 +167,8 @@ def crumbs_ld(items):
 LABELLA = {
     "slug": "labella-bungalov",
     "name": "Labella Bungalov",
-    "area": "Memnuniye Mahallesi, Sapanca",
+    "area": "Memnuniye Mahallesi, Sapanca, Sakarya",
+    "province": "Sakarya", "district": "Sapanca",
     "summary": "Orman içinde beş bağımsız A-frame bungalov. Her birinin kendine ait ısıtmalı açık havuzu, sıcak jakuzisi, şöminesi ve terası var.",
     "tags": [("Özel havuz", ""), ("Isıtmalı havuz", "warm"), ("Sıcak jakuzi", "warm"), ("Şömine", "warm"),
              ("4+1 kişilik", ""), ("Evcil hayvan: önceden sorun", "")],
@@ -207,7 +209,7 @@ def fac_row(f):
 
 
 SLOT = f"""<div class="slot">
-  <p><strong>Sapanca'da bungalov işletiyor musunuz?</strong>Tesisinizi ücretsiz ekleyin. Misafirler size doğrudan ulaşır, komisyon ödemezsiniz.</p>
+  <p><strong>Bungalov tesisi mi işletiyorsunuz?</strong>Hangi ilde olursa olsun tesisinizi ücretsiz ekleyin. Misafirler size doğrudan ulaşır, komisyon ödemezsiniz.</p>
   <a class="btn solid" href="/tesis-ekle/">Tesisinizi ekleyin</a>
 </div>"""
 
@@ -226,7 +228,8 @@ for _fn in sorted(os.listdir(CONTENT)):
         raise SystemExit(f"{_fn}: bilinmeyen görsel anahtarı {_d['image']!r} (PHOTOS içinden seçin)")
     GUIDES.append(dict(slug=_d["slug"], title=_d["title"], seo_title=_d["seo_title"], desc=_d["description"],
                        minutes=_d["minutes"], body=_d["body"], img=_d["image"], date=_d["date"],
-                       faq=[(x["q"], x["a"]) for x in _d.get("faq", [])]))
+                       faq=[(x["q"], x["a"]) for x in _d.get("faq", [])],
+                       bolge=_d.get("bolge", "sakarya/sapanca")))
 GUIDES.sort(key=lambda g: (g["date"], g["slug"]), reverse=True)
 
 # ---------------------------------------------------------------- Üyelerin eklediği tesisler
@@ -239,7 +242,7 @@ RESERVED = {"labella-bungalov"}
 
 
 def load_listings():
-    cols = ("slug,name,summary,description,district,neighborhood,address,units,capacity,beds,amenities,pets,checkin,checkout,"
+    cols = ("slug,name,summary,description,province,district,neighborhood,address,units,capacity,beds,amenities,pets,checkin,checkout,"
             "rules,phone,whatsapp,website,booking_url,instagram,photos,created_at,updated_at")
     url = f"{SB_URL}/rest/v1/listings?status=eq.yayinda&select={cols}&order=created_at.desc&limit=1000"
     try:
@@ -269,6 +272,64 @@ def load_listings():
 
 
 LISTINGS = load_listings()
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src", "iller.json"), encoding="utf-8") as _f:
+    GEO = json.load(_f)
+_TR = str.maketrans({"ç": "c", "ğ": "g", "ı": "i", "İ": "i", "ö": "o", "ş": "s", "ü": "u", "â": "a", "î": "i", "û": "u",
+                     "Ç": "c", "Ğ": "g", "Ö": "o", "Ş": "s", "Ü": "u", "I": "i"})
+
+
+def tr_slug(x):
+    return re.sub(r"[^a-z0-9]+", "-", str(x or "").translate(_TR).lower()).strip("-")
+
+
+def norm_place(x):
+    """İl / ilçe adını derli toplu yazar (ör. 'sapanca ' → 'Sapanca')."""
+    x = re.sub(r"\s+", " ", str(x or "")).strip()
+    if not x:
+        return ""
+    for il in GEO["iller"]:
+        if tr_slug(il) == tr_slug(x):
+            return il
+    first = {"i": "İ", "ı": "I"}.get(x[0], x[0].upper())
+    return first + x[1:]
+
+
+for _l in LISTINGS:
+    _l["province"] = norm_place(_l.get("province"))
+    _l["district"] = norm_place(_l.get("district"))
+
+# Bölge sayfaları: tesisi olan her il ve ilçe için otomatik üretilir.
+REGION_INTRO = {
+    ("Sakarya", "Sapanca"): ("Sapanca bungalovları",
+                             "Sapanca Gölü çevresi, İstanbul'a yakınlığı ve ormanlık yamaçlarıyla Türkiye'de bungalov tatilinin en yaygın olduğu yerlerden biri. "
+                             "Özel havuzlu, jakuzili ve şömineli bungalovların çoğu gölü çevreleyen mahallelerde. Aşağıdaki tesislerle rezervasyonu doğrudan, komisyonsuz yaparsınız."),
+}
+
+
+def region_path(il, ilce=None):
+    return f"/bolge/{tr_slug(il)}/" + (f"{tr_slug(ilce)}/" if ilce else "")
+
+
+REGIONS = {}   # (il, ilçe) -> {"listings": [...], "labella": bool}
+for _l in LISTINGS:
+    if _l["province"] and _l["district"] and tr_slug(_l["province"]) and tr_slug(_l["district"]):
+        REGIONS.setdefault((_l["province"], _l["district"]), {"listings": [], "labella": False})["listings"].append(_l)
+REGIONS.setdefault(("Sakarya", "Sapanca"), {"listings": [], "labella": False})["labella"] = True
+PROVINCES = {}
+for (_il, _ilce), _r in REGIONS.items():
+    PROVINCES.setdefault(_il, []).append(_ilce)
+
+
+def region_count(key):
+    r = REGIONS[key]
+    return len(r["listings"]) + (1 if r["labella"] else 0)
+
+
+def region_chips(current=None):
+    keys = sorted(REGIONS, key=lambda k: (-region_count(k), k[1]))
+    return "".join(f'<a href="{region_path(*k)}"{" aria-current=\"page\"" if k == current else ""}>{esc(k[1])}<small>{esc(k[0])} · {region_count(k)}</small></a>'
+                   for k in keys)
 PETS = {"evet": "Evcil hayvan kabul edilir", "hayir": "Evcil hayvan kabul edilmez", "sor": "Evcil hayvan için önceden sorun"}
 
 
@@ -300,11 +361,11 @@ def digits(p):
 
 
 def place_of(l):
-    return ", ".join(x for x in [l.get("neighborhood"), l.get("district")] if x)
+    return ", ".join(x for x in [l.get("neighborhood"), l.get("district"), l.get("province")] if x)
 
 
 def full_address(l):
-    return ", ".join(x.strip() for x in [l.get("address") or "", l.get("neighborhood") or "", l.get("district") or "", "Sakarya"] if x.strip())
+    return ", ".join(x.strip() for x in [l.get("address") or "", l.get("neighborhood") or "", l.get("district") or "", l.get("province") or ""] if x.strip())
 
 
 def is_warm(a):
@@ -321,7 +382,7 @@ def listing_row(l):
         tags.append("<li>Evcil hayvan kabul edilir</li>")
     summary = f'<p>{esc(l["summary"])}</p>' if l.get("summary") else ""
     tag_html = f'<ul class="tags" aria-label="Öne çıkan olanaklar">{"".join(tags)}</ul>' if tags else ""
-    return f"""<article class="fac" data-slug="{esc(l['slug'])}">
+    return f"""<article class="fac" data-slug="{esc(l['slug'])}" data-il="{esc(l.get('province') or '')}">
   <a class="shots{'' if len(ph) == 3 else ' one'}" href="{url}" tabindex="-1" aria-hidden="true">{shots}</a>
   <div>
     <h3><a href="{url}">{esc(l["name"])}</a></h3>
@@ -339,6 +400,14 @@ def paras(text):
         if p.strip():
             out.append("<p>" + esc(re.sub(r"\s*\n\s*", " ", p.strip())) + "</p>")
     return "".join(out)
+
+
+def listing_crumbs(l, self_path=None):
+    items = [("/tesisler/", "Tesisler")]
+    il, ilce = l.get("province"), l.get("district")
+    if (il, ilce) in REGIONS:
+        items += [(region_path(il), il), (region_path(il, ilce), ilce)]
+    return items + [(self_path, l["name"])]
 
 
 def build_listing(l):
@@ -400,7 +469,7 @@ def build_listing(l):
             links.append(f'<a href="https://instagram.com/{ig}" rel="noopener nofollow" target="_blank">Instagram: @{ig}</a>')
     links_html = f'<p style="margin:14px 0 0;font-size:15px">{" · ".join(links)}</p>' if links else ""
     body = f"""
-<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (None, name)])}
+<div class="wrap">{crumbs(listing_crumbs(l))}
 <header class="page-head"><h1>{esc(name)}</h1>
 {f'<p class="place" style="margin-top:10px">{esc(place)}</p>' if place else ""}
 {f'<p>{esc(l["summary"])}</p>' if l.get("summary") else ""}
@@ -427,7 +496,7 @@ def build_listing(l):
 </div>
 """
     lodging = {"@context": "https://schema.org", "@type": "LodgingBusiness", "name": name, "url": SITE + path,
-               "address": {"@type": "PostalAddress", "addressLocality": l.get("district") or "Sapanca", "addressRegion": "Sakarya", "addressCountry": "TR"}}
+               "address": {"@type": "PostalAddress", "addressLocality": l.get("district") or "", "addressRegion": l.get("province") or "", "addressCountry": "TR"}}
     if l.get("summary"):
         lodging["description"] = l["summary"]
     if photos:
@@ -444,16 +513,17 @@ def build_listing(l):
         lodging["numberOfRooms"] = l["units"]
     if l.get("amenities"):
         lodging["amenityFeature"] = [{"@type": "LocationFeatureSpecification", "name": a, "value": True} for a in l["amenities"]]
-    title = f"{name} – {place + ' ' if place else ''}Bungalov | Bungalov Dünyası"
+    where = ", ".join(x for x in [l.get("district"), l.get("province")] if x)
+    title = f"{name} – {where + ' ' if where else ''}Bungalov | Bungalov Dünyası"
     desc_meta = (l.get("summary") or f"{name}: fotoğraflar, olanaklar ve doğrudan iletişim bilgileri.")[:160]
-    write(path, page(path, title, desc_meta, body, [lodging, crumbs_ld([("/tesisler/", "Tesisler"), (path, name)])],
+    write(path, page(path, title, desc_meta, body, [lodging, crumbs_ld(listing_crumbs(l, path))],
                      active="/tesisler/", og_image=photo_url(photos[0]["path"]) if photos else None, scripts=["fav"]))
 
 
 # ---------------------------------------------------------------- Sayfalar
 def build_home():
     find = "".join(f'<a href="{h}">{t}</a>' for h, t in [
-        ("/tesisler/", "Özel havuzlu"),
+        (region_path("Sakarya", "Sapanca"), "Sapanca"),
         ("/rehber/kisin-sapanca-bungalov-isitmali-havuz-jakuzi-somine/", "Kış için: jakuzi ve şömine"),
         ("/rehber/evcil-hayvanla-sapanca-bungalov/", "Evcil hayvanla"),
         ("/rehber/sapanca-bungalov-kiralamadan-once-sorulacak-sorular/", "İlk kez kiralayacağım")])
@@ -462,8 +532,8 @@ def build_home():
   <img class="hero-img" src="{ux('hero', 1920, 1100)}" srcset="{ux('hero', 900, 1100)} 900w, {ux('hero', 1920, 1100)} 1920w" sizes="100vw" alt="{esc(PHOTOS['hero'][1])}" fetchpriority="high">
   <div class="wrap">
     <div class="copy">
-      <h1>Sapanca'da bungalov, fotoğrafın ötesiyle.</h1>
-      <p class="lead">Havuz gerçekten özel mi, jakuzi kışın sıcak mı, şömine yanıyor mu? Tesisleri ayrıntısıyla anlatıyor, sizi doğrudan tesisle buluşturuyoruz.</p>
+      <h1>Bungalov tatili, fotoğrafın ötesiyle.</h1>
+      <p class="lead">Havuz gerçekten özel mi, jakuzi kışın sıcak mı, şömine yanıyor mu? Türkiye'deki bungalov tesislerini ayrıntısıyla anlatıyor, sizi doğrudan tesisle buluşturuyoruz.</p>
       <div class="find" aria-label="Ne arıyorsunuz?">{find}</div>
     </div>
     <p class="hero-credit">{credit('hero')}</p>
@@ -471,9 +541,16 @@ def build_home():
 </section>
 
 <section class="block"><div class="wrap">
-  <div class="head"><h2>Tesisler</h2><p>Her tesisi tek tek tanıyoruz. Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan bungalovlar giriyor.</p></div>
+  <div class="head"><h2>Bölgeler</h2><p>Rehbere Sapanca'daki tesislerle başladık. Karadeniz yaylalarından Ege ve Akdeniz kıyısına, yeni bölgeler tesis sahipleri katıldıkça ekleniyor.</p></div>
+  <nav class="regions" aria-label="Bölgeler">{region_chips()}<a class="add" href="/tesis-ekle/">+ Bölgenizdeki tesisi ekleyin</a></nav>
+</div></section>
+
+<section class="block" style="padding-top:0"><div class="wrap">
+  <div class="head"><h2>Tesisler</h2><p>Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan bungalovlar giriyor.</p></div>
+  <div class="fac-list">
   {fac_row(LABELLA)}
   {"".join(listing_row(l) for l in LISTINGS[:3])}
+  </div>
   {f'<p class="more-link"><a class="btn line" href="/tesisler/">Bütün tesisler ({len(LISTINGS) + 1})</a></p>' if len(LISTINGS) > 3 else ""}
   {SLOT}
 </div></section>
@@ -489,8 +566,8 @@ def build_home():
               {"@context": "https://schema.org", "@type": "Organization", "name": NAME, "url": SITE + "/",
                "logo": SITE + "/favicon.svg",
                "contactPoint": {"@type": "ContactPoint", "telephone": "+" + WA, "contactType": "customer support", "areaServed": "TR", "availableLanguage": "Turkish"}}]
-    write("/", page("/", "Sapanca Bungalov Rehberi | Özel Havuzlu, Jakuzili Bungalovlar – Bungalov Dünyası",
-                    "Sapanca'da özel havuzlu, ısıtmalı havuzlu, jakuzili ve şömineli bungalovlar. Tesisleri ayrıntısıyla tanıyın, rezervasyonu komisyonsuz doğrudan tesisle yapın.",
+    write("/", page("/", "Bungalov Dünyası | Özel Havuzlu, Jakuzili ve Şömineli Bungalov Rehberi",
+                    "Türkiye'de özel havuzlu, jakuzili ve şömineli bungalovlar. Tesisleri ayrıntısıyla tanıyın, rezervasyonu komisyonsuz doğrudan tesisle yapın.",
                     body, schema))
 
 
@@ -517,13 +594,13 @@ def owner_band():
 
 
 def build_facilities():
-    items = [("/tesisler/", "Tesisler")]
     body = f"""
 <div class="wrap">{crumbs([(None, "Tesisler")])}
-<header class="page-head"><h1>Sapanca bungalov tesisleri</h1>
+<header class="page-head"><h1>Bungalov tesisleri</h1>
 <p>Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan tesisleri ekliyoruz. Fiyat ve müsaitlik için tesisle doğrudan görüşürsünüz.</p></header>
+<nav class="regions" aria-label="Bölgeler">{region_chips()}</nav>
 </div>
-<section class="block" style="padding-top:12px"><div class="wrap">
+<section class="block" style="padding-top:28px"><div class="wrap">
   <div id="uye-tesisler" class="fac-list">
   {fac_row(LABELLA)}
   {"".join(listing_row(l) for l in LISTINGS)}
@@ -531,9 +608,61 @@ def build_facilities():
   {SLOT}
 </div></section>
 """
-    write("/tesisler/", page("/tesisler/", "Sapanca Bungalov Tesisleri – Bungalov Dünyası",
-                             "Sapanca'da özel havuzlu, jakuzili ve şömineli bungalov tesisleri. Fotoğraflar, olanaklar ve doğrudan iletişim bilgileri.",
+    write("/tesisler/", page("/tesisler/", "Bungalov Tesisleri: Özel Havuzlu, Jakuzili, Şömineli – Bungalov Dünyası",
+                             "Türkiye'de özel havuzlu, jakuzili ve şömineli bungalov tesisleri. Fotoğraflar, olanaklar ve doğrudan iletişim bilgileri.",
                              body, [crumbs_ld([("/tesisler/", "Tesisler")])], active="/tesisler/", scripts=["tesisler"]))
+
+
+def build_regions():
+    """Tesisi olan her il ve ilçe için bölge sayfası."""
+    for (il, ilce), r in REGIONS.items():
+        path = region_path(il, ilce)
+        title, intro = REGION_INTRO.get((il, ilce), (f"{ilce} bungalovları", f"{ilce} ({il}) bölgesindeki bungalov tesisleri. Fotoğraflarına, olanaklarına ve kurallarına bakın; rezervasyonu doğrudan tesisle, komisyonsuz yapın."))
+        rows = (fac_row(LABELLA) if r["labella"] else "") + "".join(listing_row(l) for l in r["listings"])
+        guides = [g for g in GUIDES if g["bolge"] == f"{tr_slug(il)}/{tr_slug(ilce)}"]
+        g_html = ""
+        if guides:
+            items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min">{g["minutes"]} dk okuma</span></a></li>' for g in guides)
+            g_html = f'<section class="block mist"><div class="wrap"><div class="head"><h2>{esc(ilce)} rehberi</h2></div><ul class="guides">{items}</ul></div></section>'
+        n = region_count((il, ilce))
+        body = f"""
+<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (region_path(il), il), (None, ilce)])}
+<header class="page-head"><h1>{esc(title)}</h1><p>{esc(intro)}</p></header>
+<nav class="regions" aria-label="Bölgeler">{region_chips((il, ilce))}</nav>
+</div>
+<section class="block" style="padding-top:28px"><div class="wrap">
+  <div class="fac-list">{rows}</div>
+  <div class="slot">
+    <p><strong>{esc(ilce)}'da bungalov mu işletiyorsunuz?</strong>Tesisinizi ücretsiz ekleyin; bu sayfada hemen yer alsın.</p>
+    <a class="btn solid" href="/tesis-ekle/">Tesisinizi ekleyin</a>
+  </div>
+</div></section>
+{g_html}
+"""
+        write(path, page(path, f"{ilce} Bungalov: Özel Havuzlu, Jakuzili Tesisler ({n}) – Bungalov Dünyası",
+                         f"{ilce}, {il} bölgesinde {n} bungalov tesisi: fotoğraflar, olanaklar ve doğrudan iletişim. Rezervasyon komisyonsuz, doğrudan tesisle.",
+                         body, [crumbs_ld([("/tesisler/", "Tesisler"), (region_path(il), il), (path, ilce)])], active="/tesisler/"))
+    for il, ilceler in PROVINCES.items():
+        path = region_path(il)
+        rows = ""
+        for ilce in sorted(ilceler):
+            r = REGIONS[(il, ilce)]
+            rows += (fac_row(LABELLA) if r["labella"] else "") + "".join(listing_row(l) for l in r["listings"])
+        n = sum(region_count((il, x)) for x in ilceler)
+        chips = "".join(f'<a href="{region_path(il, x)}">{esc(x)}<small>{region_count((il, x))} tesis</small></a>' for x in sorted(ilceler))
+        body = f"""
+<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (None, il)])}
+<header class="page-head"><h1>{esc(il)} bungalovları</h1><p>{esc(il)} ilindeki bungalov tesisleri. İlçeye göre bakabilir, rezervasyonu doğrudan tesisle yapabilirsiniz.</p></header>
+<nav class="regions" aria-label="İlçeler">{chips}</nav>
+</div>
+<section class="block" style="padding-top:28px"><div class="wrap">
+  <div class="fac-list">{rows}</div>
+  {SLOT}
+</div></section>
+"""
+        write(path, page(path, f"{il} Bungalov Tesisleri ({n}) – Bungalov Dünyası",
+                         f"{il} ilinde {n} bungalov tesisi: {', '.join(sorted(ilceler))}. Fotoğraflar, olanaklar ve doğrudan iletişim.",
+                         body, [crumbs_ld([("/tesisler/", "Tesisler"), (path, il)])], active="/tesisler/"))
 
 
 def build_labella():
@@ -547,7 +676,7 @@ def build_labella():
     amen_html = "".join(f"<li>{esc(a)}</li>" for a in amen)
     ask = wa(f"Merhaba, Bungalov Dünyası'ndan ulaşıyorum. Labella Bungalov için müsaitlik sormak istiyorum: [giriş] – [çıkış], [kişi sayısı] kişi.")
     body = f"""
-<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (None, f["name"])])}
+<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (region_path("Sakarya"), "Sakarya"), (region_path("Sakarya", "Sapanca"), "Sapanca"), (None, f["name"])])}
 <header class="page-head"><h1>{esc(f["name"])}</h1>
 <p>{esc(f["summary"])}</p>
 <ul class="tags" style="margin-top:18px">{tags}</ul></header>
@@ -598,20 +727,20 @@ def build_labella():
     }
     write(path, page(path, "Labella Bungalov – Sapanca Özel Havuzlu, Jakuzili A-Frame Bungalov | Bungalov Dünyası",
                      "Sapanca Memnuniye'de 5 bağımsız A-frame bungalov: ısıtmalı özel havuz, sıcak jakuzi, şömine, 4+1 kişilik. Fotoğraflar, olanaklar ve doğrudan iletişim.",
-                     body, [lodging, crumbs_ld([("/tesisler/", "Tesisler"), (path, f["name"])])], active="/tesisler/",
+                     body, [lodging, crumbs_ld([("/tesisler/", "Tesisler"), (region_path("Sakarya"), "Sakarya"), (region_path("Sakarya", "Sapanca"), "Sapanca"), (path, f["name"])])], active="/tesisler/",
                      og_image=UP + f["shots"][0][0]))
 
 
 def build_guides():
     body = f"""
 <div class="wrap">{crumbs([(None, "Rehber")])}
-<header class="page-head"><h1>Sapanca bungalov rehberi</h1>
+<header class="page-head"><h1>Bungalov rehberi</h1>
 <p>Bungalov seçerken neye bakmalı, hangi mevsimde ne beklemeli, nelere dikkat etmeli? Kısa ve somut yazılar.</p></header>
 <div class="prose" style="max-width:none">{guide_list()}</div>
 </div>
 """
-    write("/rehber/", page("/rehber/", "Sapanca Bungalov Rehberi: Seçim, Kış Tatili, Evcil Hayvan | Bungalov Dünyası",
-                           "Sapanca'da bungalov kiralamadan önce bilmeniz gerekenler: sorulacak sorular, kışın ısıtmalı havuz ve jakuzi, evcil hayvanla tatil.",
+    write("/rehber/", page("/rehber/", "Bungalov Rehberi: Seçim, Kış Tatili, Evcil Hayvan, Sapanca | Bungalov Dünyası",
+                           "Bungalov kiralamadan önce bilmeniz gerekenler: sorulacak sorular, kışın ısıtmalı havuz ve jakuzi, evcil hayvanla tatil ve bölge rehberleri.",
                            body, [crumbs_ld([("/rehber/", "Rehber")])], active="/rehber/"))
     for g in GUIDES:
         path = f'/rehber/{g["slug"]}/'
@@ -818,7 +947,7 @@ def build_account():
 
 
 def build_owner():
-    opts_d = "".join(f'<option>{d}</option>' for d in ["Sapanca", "Kartepe", "Serdivan", "Diğer"])
+    opts_il = '<option value="">İl seçin</option>'
     opts_p = '<option value="sor">Önceden sorulsun</option><option value="evet">Kabul edilir</option><option value="hayir">Kabul edilmez</option>'
     body = f"""
 <div class="wrap">{crumbs([("/hesabim/", "Hesabım"), (None, "Tesis ekle")])}
@@ -864,9 +993,11 @@ def build_owner():
 <section class="fsec">
   <h2><span>5</span> Adres ve konum</h2>
   <div class="grid3">
-    {field("f-district", "İlçe", "select", attrs=opts_d)}
+    {field("f-province", "İl", "select", attrs=opts_il)}
+    {field("f-district", "İlçe", attrs='maxlength="40" list="ilceler" autocomplete="off" placeholder="ör. Sapanca"')}
     {field("f-neighborhood", "Mahalle / köy", attrs='maxlength="80" placeholder="ör. Kırkpınar"')}
   </div>
+  <datalist id="ilceler"></datalist>
   {field("f-address", "Açık adres", attrs='maxlength="300" placeholder="Sokak, numara"', wide=True)}
   <div class="map-prev"><iframe id="map-frame" title="Harita önizlemesi" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden></iframe><p id="map-empty">Adresi yazdığınızda harita burada görünür.</p></div>
   <p class="hint">Harita yanlış yeri gösteriyorsa adrese mahalle ya da köy adını ekleyin. <a id="map-link" href="https://www.google.com/maps" target="_blank" rel="noopener">Google Haritalar'da aç</a></p>
@@ -920,7 +1051,7 @@ def build_listing_shell():
 <div id="tesis" hidden></div>
 </div>
 """
-    write("/tesis/", page("/tesis/", "Tesis – Bungalov Dünyası", "Sapanca bungalov tesisi: fotoğraflar, olanaklar ve doğrudan iletişim.",
+    write("/tesis/", page("/tesis/", "Tesis – Bungalov Dünyası", "Bungalov tesisi: fotoğraflar, olanaklar ve doğrudan iletişim.",
                           body, scripts=["tesis"], noindex=True, active="/tesisler/"))
 
 
@@ -972,7 +1103,7 @@ def build_legal():
 <header class="page-head"><h1>Üyelik koşulları</h1><p>Bungalov Dünyası'na üye olarak aşağıdaki koşulları kabul etmiş olursunuz.</p></header>
 <div class="prose">
   <h2>Hizmet</h2>
-  <p>Bungalov Dünyası, Sapanca ve çevresindeki bungalov tesislerini tanıtan ücretsiz bir rehberdir. Rezervasyon ve ödeme misafir ile tesis arasında doğrudan yapılır; Bungalov Dünyası bu işlemlerin tarafı değildir ve komisyon almaz.</p>
+  <p>Bungalov Dünyası, Türkiye'deki bungalov tesislerini tanıtan ücretsiz bir rehberdir. Rezervasyon ve ödeme misafir ile tesis arasında doğrudan yapılır; Bungalov Dünyası bu işlemlerin tarafı değildir ve komisyon almaz.</p>
   <h2>Üyelik türleri</h2>
   <ul>
     <li><strong>Kurumsal üyelik</strong>, bungalov tesisi işleten ya da tesis adına yetkili kişiler içindir. Kurumsal üyeler tesis sayfası oluşturabilir ve düzenleyebilir.</li>
@@ -1091,7 +1222,7 @@ def build_app():
 
 <section class="block"><div class="wrap narrow">
   <h2>Neden ücretsiz?</h2>
-  <p>Bungalov Dünyası, Sapanca'daki bungalovları misafirle komisyonsuz buluşturmaya çalışan bir rehber. Rehbere katılan tesislerin işini kolaylaştırmak bizim de işimize yarıyor: düzenli çalışan tesis, memnun misafir demek. Uygulamayı da bu yüzden rehberdeki tesislere ücretsiz veriyoruz.</p>
+  <p>Bungalov Dünyası, Türkiye'deki bungalovları misafirle komisyonsuz buluşturmaya çalışan bir rehber. Rehbere katılan tesislerin işini kolaylaştırmak bizim de işimize yarıyor: düzenli çalışan tesis, memnun misafir demek. Uygulamayı da bu yüzden rehberdeki tesislere ücretsiz veriyoruz.</p>
   <p class="disclose">Açıklık notu: Uygulamayı geliştiren ve Bungalov Dünyası'nı hazırlayan ekip, Sapanca'da Labella Bungalov'u işletiyor. Ekran görüntüleri örnek verilerle hazırlandı; gerçek misafir bilgisi içermez.</p>
   <h2>Sık sorulanlar</h2>
   {faq}
@@ -1120,10 +1251,11 @@ def build_about():
     body = f"""
 <div class="wrap">{crumbs([(None, "Hakkımızda")])}
 <header class="page-head"><h1>Hakkımızda</h1>
-<p>Bungalov Dünyası, Sapanca'da bungalov arayanların fotoğrafların ötesini görmesi için hazırlanan bir rehber.</p></header>
+<p>Bungalov Dünyası, bungalov arayanların fotoğrafların ötesini görmesi için hazırlanan bir rehber.</p></header>
 {cover("lake")}
 <div class="prose">
-  <p>Sapanca'da bungalov ilanları birbirine çok benziyor. Hangisinin havuzu gerçekten özel, hangisinin jakuzisi kışın sıcak, hangisinde evcil hayvan kabul ediliyor, çoğu zaman ancak tesise sorarak öğrenebiliyorsunuz. Bu rehberi o soruların cevaplarını baştan yazmak için hazırlıyoruz.</p>
+  <p>Bungalov ilanları birbirine çok benziyor. Hangisinin havuzu gerçekten özel, hangisinin jakuzisi kışın sıcak, hangisinde evcil hayvan kabul ediliyor, çoğu zaman ancak tesise sorarak öğrenebiliyorsunuz. Bu rehberi o soruların cevaplarını baştan yazmak için hazırlıyoruz.</p>
+  <p>İlk bölgemiz, bungalov tatilinin en yaygın olduğu yerlerden biri olan Sapanca. Türkiye'nin başka bölgelerindeki tesisler de üye olup kendi sayfalarını oluşturdukça rehbere ekleniyor.</p>
   <h2>Nasıl çalışıyoruz?</h2>
   <ul>
     <li><strong>Aracı değiliz.</strong> Rezervasyonu ve ödemeyi doğrudan tesisle yaparsınız. Biz araya girmiyoruz, komisyon almıyoruz.</li>
@@ -1136,7 +1268,7 @@ def build_about():
 </div>
 """
     write("/hakkimizda/", page("/hakkimizda/", "Hakkımızda – Bungalov Dünyası",
-                               "Bungalov Dünyası, Sapanca'da bungalov arayanlar için hazırlanan bağımsız ve komisyonsuz bir rehber.",
+                               "Bungalov Dünyası, Türkiye'de bungalov arayanlar için hazırlanan bağımsız ve komisyonsuz bir rehber.",
                                body, [crumbs_ld([("/hakkimizda/", "Hakkımızda")])], active="/hakkimizda/"))
 
 
@@ -1154,7 +1286,9 @@ def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
     urls = [("/", newest), ("/tesisler/", max([str(l.get("updated_at") or "")[:10] for l in LISTINGS] + ["2026-10-13"])), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
         [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
-        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14")]
+        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14")] + \
+        [(region_path(*k), max([str(l.get("updated_at") or "")[:10] for l in r["listings"]] + ["2026-10-14"])) for k, r in REGIONS.items()] + \
+        [(region_path(il), "2026-10-14") for il in PROVINCES]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
@@ -1166,6 +1300,7 @@ def build_meta():
     shutil.copy(os.path.join(os.path.dirname(OUT), "src", "style.css"), os.path.join(OUT, "style.css"))
     shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "img"), os.path.join(OUT, "img"))
     shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "js"), os.path.join(OUT, "js"))
+    write("/js/iller.js", "window.BD_ILLER = " + json.dumps(GEO, ensure_ascii=False) + ";\n")
 
 
 if __name__ == "__main__":
@@ -1173,7 +1308,7 @@ if __name__ == "__main__":
         shutil.rmtree(OUT)
     os.makedirs(OUT)
     build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404()
-    build_member(); build_account(); build_listing_shell(); build_legal()
+    build_member(); build_account(); build_listing_shell(); build_legal(); build_regions()
     for _l in LISTINGS:
         build_listing(_l)
     build_meta()

@@ -190,3 +190,7 @@ create policy tf_insert on storage.objects for insert to authenticated
 drop policy if exists tf_delete on storage.objects;
 create policy tf_delete on storage.objects for delete to authenticated
   using (bucket_id = 'tesis-foto' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_site_admin()));
+
+-- ---------------------------------------------------------------- Türkiye geneli: il alanı (2026-10-14)
+alter table public.listings add column if not exists province text not null default '' check (length(province) <= 40);
+alter table public.listings alter column district set default '';
