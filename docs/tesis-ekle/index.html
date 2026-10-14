@@ -41,7 +41,7 @@
   <h2><span>1</span> Temel bilgiler</h2>
   <label class="fld wide" for="f-name"><span>Tesisin adı</span><input id="f-name" type="text" required maxlength="80" placeholder="ör. Göl Evi Bungalov"></label>
   <label class="fld wide" for="f-summary"><span>Kısa tanıtım</span><textarea id="f-summary" rows="3" maxlength="300" data-max="300"></textarea><small class="hint">Listede ve sayfanın başında görünür. 1-2 cümle.</small></label>
-  <div class="ai-bar"><button type="button" class="ai" data-ai="summary" data-target="#f-summary">✦ Yapay zekâ ile yaz</button><button type="button" class="ai soft" data-ai="improve" data-target="#f-summary">Yazımı düzelt</button><span class="count" id="f-summary-n"></span></div>
+  <div class="ai-bar"><span class="count" id="f-summary-n"></span></div>
   <div class="grid3">
     <label class="fld" for="f-units"><span>Bungalov sayısı</span><input id="f-units" type="number" min="1" max="200" inputmode="numeric"></label>
     <label class="fld" for="f-capacity"><span>Kapasite</span><input id="f-capacity" type="text" maxlength="80" placeholder="ör. 2+1 kişi"></label>
@@ -58,9 +58,8 @@
 
 <section class="fsec">
   <h2><span>3</span> Tanıtım yazısı</h2>
-  <label class="fld wide" for="f-notes"><span>Yapay zekâ için notlarınız (isteğe bağlı)</span><textarea id="f-notes" rows="3" maxlength="800" placeholder="ör. Göle 5 dakika yürüme mesafesi, her bungalovun kendi bahçesi var, kahvaltı kapıya geliyor."></textarea><small class="hint">Yazılmasını istediğiniz özellikleri kısaca yazın. Bu notlar sayfada görünmez; yalnızca yardımcı metni yazarken kullanır.</small></label>
   <label class="fld wide" for="f-description"><span>Açıklama</span><textarea id="f-description" rows="10" maxlength="6000" data-max="6000"></textarea><small class="hint">Bungalovları, olanakları, çevreyi ve kimlere uygun olduğunu anlatın. Paragraflar arasında boş satır bırakın.</small></label>
-  <div class="ai-bar"><button type="button" class="ai" data-ai="description" data-target="#f-description">✦ Yapay zekâ ile yaz</button><button type="button" class="ai soft" data-ai="improve" data-target="#f-description">Yazımı düzelt</button><span class="count" id="f-description-n"></span></div>
+  <div class="ai-bar"><span class="count" id="f-description-n"></span></div>
 </section>
 
 <section class="fsec">
@@ -89,7 +88,7 @@
     <label class="fld" for="f-checkout"><span>Çıkış saati</span><input id="f-checkout" type="time" ></label>
   </div>
   <label class="fld wide" for="f-rules"><span>Tesis kuralları</span><textarea id="f-rules" rows="6" maxlength="2000" data-max="2000" placeholder="- Sessiz saatler 23:00 – 08:00&#10;- İçeride sigara içilmez"></textarea><small class="hint">Her kuralı ayrı satıra yazın.</small></label>
-  <div class="ai-bar"><button type="button" class="ai" data-ai="rules" data-target="#f-rules">✦ Kuralları yaz</button><button type="button" class="ai soft" data-ai="improve" data-target="#f-rules">Yazımı düzelt</button><span class="count" id="f-rules-n"></span></div>
+  <div class="ai-bar"><span class="count" id="f-rules-n"></span></div>
 </section>
 
 <section class="fsec">
@@ -135,8 +134,8 @@
 </div></footer>
 <script>try{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}catch(e){}</script>
 <script src="/js/vendor/supabase-2.117.0.js"></script>
-<script src="/js/core.js?v=212737f6"></script>
-<script src="/js/tesis-form.js?v=212737f6"></script>
+<script src="/js/core.js?v=a393a072"></script>
+<script src="/js/tesis-form.js?v=a393a072"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e4d1630b9947485b835f8b18c6dd0d75"}'></script>
 </body>
 </html>

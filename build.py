@@ -508,7 +508,6 @@ def owner_band():
   <div>
     <ul>
       <li>Ücretsiz üye olun, tesisinizi kendiniz ekleyin; sayfanız hemen yayında</li>
-      <li>Tanıtım yazısı için yapay zekâ yardımcısı</li>
       <li>Ücretsiz Bungalov Yönetim uygulaması: takvim, rezervasyon ve misafir mesajları tek yerde</li>
       <li>Kendi web sitenize ekleyebileceğiniz rezervasyon sayfası</li>
     </ul>
@@ -662,10 +661,8 @@ def field(id_, label, kind="text", hint="", attrs="", wide=False):
     return f'<label class="fld{" wide" if wide else ""}" for="{id_}"><span>{label}</span>{inp}{h}</label>'
 
 
-def ai_bar(target, task, label="Yapay zekâ ile yaz"):
-    return (f'<div class="ai-bar"><button type="button" class="ai" data-ai="{task}" data-target="#{target}">✦ {label}</button>'
-            f'<button type="button" class="ai soft" data-ai="improve" data-target="#{target}">Yazımı düzelt</button>'
-            f'<span class="count" id="{target}-n"></span></div>')
+def counter(target):
+    return f'<div class="ai-bar"><span class="count" id="{target}-n"></span></div>'
 
 
 KVKK_LINE = ('<a href="/uyelik-kosullari/" target="_blank">Üyelik koşullarını</a> kabul ediyorum, '
@@ -765,7 +762,6 @@ def build_member():
   <ul class="ticks">
     <li>Tesisinizi kendiniz ekleyin; kaydettiğiniz anda yayında</li>
     <li>Fotoğraflar, olanaklar, kurallar ve harita konumu</li>
-    <li>Tanıtım yazısını yapay zekâ yardımcısıyla birkaç saniyede hazırlayın</li>
     <li>Misafir size doğrudan ulaşır, komisyon yok</li>
     <li>Ücretsiz <a href="/uygulama/">Bungalov Yönetim</a> uygulaması</li>
   </ul>
@@ -836,7 +832,7 @@ def build_owner():
   <h2><span>1</span> Temel bilgiler</h2>
   {field("f-name", "Tesisin adı", attrs='required maxlength="80" placeholder="ör. Göl Evi Bungalov"', wide=True)}
   {field("f-summary", "Kısa tanıtım", "textarea", hint="Listede ve sayfanın başında görünür. 1-2 cümle.", attrs='rows="3" maxlength="300" data-max="300"', wide=True)}
-  {ai_bar("f-summary", "summary")}
+  {counter("f-summary")}
   <div class="grid3">
     {field("f-units", "Bungalov sayısı", "number", attrs='min="1" max="200" inputmode="numeric"')}
     {field("f-capacity", "Kapasite", attrs='maxlength="80" placeholder="ör. 2+1 kişi"')}
@@ -853,9 +849,8 @@ def build_owner():
 
 <section class="fsec">
   <h2><span>3</span> Tanıtım yazısı</h2>
-  {field("f-notes", "Yapay zekâ için notlarınız (isteğe bağlı)", "textarea", hint="Yazılmasını istediğiniz özellikleri kısaca yazın. Bu notlar sayfada görünmez; yalnızca yardımcı metni yazarken kullanır.", attrs='rows="3" maxlength="800" placeholder="ör. Göle 5 dakika yürüme mesafesi, her bungalovun kendi bahçesi var, kahvaltı kapıya geliyor."', wide=True)}
   {field("f-description", "Açıklama", "textarea", hint="Bungalovları, olanakları, çevreyi ve kimlere uygun olduğunu anlatın. Paragraflar arasında boş satır bırakın.", attrs='rows="10" maxlength="6000" data-max="6000"', wide=True)}
-  {ai_bar("f-description", "description")}
+  {counter("f-description")}
 </section>
 
 <section class="fsec">
@@ -884,7 +879,7 @@ def build_owner():
     {field("f-checkout", "Çıkış saati", "time")}
   </div>
   {field("f-rules", "Tesis kuralları", "textarea", hint="Her kuralı ayrı satıra yazın.", attrs='rows="6" maxlength="2000" data-max="2000" placeholder="- Sessiz saatler 23:00 – 08:00&#10;- İçeride sigara içilmez"', wide=True)}
-  {ai_bar("f-rules", "rules", "Kuralları yaz")}
+  {counter("f-rules")}
 </section>
 
 <section class="fsec">
@@ -960,8 +955,7 @@ def build_legal():
   <ul>
     <li><strong>Supabase</strong> (veritabanı, üyelik ve fotoğraf depolama),</li>
     <li><strong>GitHub Pages</strong> ve <strong>Cloudflare</strong> (sitenin yayımlanması ve ziyaret istatistikleri),</li>
-    <li><strong>Google</strong> (yalnızca Google ile giriş yaptığınızda),</li>
-    <li><strong>Anthropic</strong> (yalnızca kurumsal üyeler yapay zekâ yardımcısını kullandığında, formdaki tesis bilgileri metin yazmak için gönderilir; üyelik bilgileriniz gönderilmez).</li>
+    <li><strong>Google</strong> (yalnızca Google ile giriş yaptığınızda ve harita önizlemesi için).</li>
   </ul>
   <p>Yurt dışına aktarım, KVKK m. 9'da öngörülen şartlara uygun olarak yapılır.</p>
   <h2>Ne kadar süre saklanır?</h2>
@@ -994,8 +988,6 @@ def build_legal():
   </ul>
   <h2>Yayından kaldırma</h2>
   <p>Bu koşullara aykırı, yanıltıcı ya da misafirlerden ciddi şikâyet alan sayfaları önceden haber vermeksizin yayından kaldırabilir, gerekirse üyeliği sonlandırabiliriz.</p>
-  <h2>Yapay zekâ yardımcısı</h2>
-  <p>Kurumsal üyelerin kullanabildiği yazım yardımcısı, girdiğiniz bilgilerden taslak metin üretir. Yayımlamadan önce metni kontrol etmek ve doğruluğundan emin olmak sizin sorumluluğunuzdadır. Yardımcının günlük kullanım sınırı vardır.</p>
   <h2>Hesabın kapatılması</h2>
   <p>Hesabınızı istediğiniz zaman kapatabilirsiniz. Bunun için {contact} üzerinden bize yazmanız yeterli.</p>
   <h2>Değişiklikler</h2>

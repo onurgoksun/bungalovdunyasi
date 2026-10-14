@@ -160,41 +160,6 @@
   });
   $("#photo-pick").addEventListener("click", function () { $("#photo-input").click(); });
 
-  // ---------------------------------------------------------------- Yapay zekâ yardımcısı
-  $$("[data-ai]").forEach(function (b) {
-    b.addEventListener("click", async function () {
-      var target = $(b.dataset.target);
-      var task = b.dataset.ai;
-      if (task === "improve" && !target.value.trim()) { BD.msg(msg, "Düzeltmek için önce bir metin yazın.", "bad"); return; }
-      var f = collect();
-      f.pets = { evet: "kabul edilir", hayir: "kabul edilmez", sor: "önceden sorulmalı" }[f.pets] || "";
-      f.notes = $("#f-notes") ? $("#f-notes").value : "";
-      var old = target.value;
-      var label = b.textContent;
-      b.disabled = true; b.textContent = "Yazılıyor…";
-      try {
-        var s = await BD.session();
-        var r = await fetch(BD.URL + "/functions/v1/ai-yazar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.access_token, "apikey": BD.KEY },
-          body: JSON.stringify({ task: task === "improve" ? "improve" : task, fields: f, text: old })
-        });
-        var j = await r.json().catch(function () { return {}; });
-        if (!r.ok || !j.text) throw new Error(j.error || "Yardımcı şu an yanıt veremiyor.");
-        var max = parseInt(target.dataset.max || "0", 10);
-        target.value = max ? j.text.slice(0, max) : j.text;
-        counters();
-        var undo = el("button", { type: "button", class: "mini", text: "Geri al", onclick: function () { target.value = old; counters(); undo.remove(); } });
-        b.parentNode.appendChild(undo);
-        setTimeout(function () { if (undo.isConnected) undo.remove(); }, 30000);
-      } catch (err) {
-        BD.msg(msg, err instanceof TypeError ? "Yardımcıya şu an ulaşılamıyor. Biraz sonra tekrar deneyin." : err.message, "bad");
-      } finally {
-        b.disabled = false; b.textContent = label;
-      }
-    });
-  });
-
   // ---------------------------------------------------------------- Kaydet
   var RESERVED = ["labella-bungalov", "tesis", "yeni"];
   async function uniqueSlug(name) {
