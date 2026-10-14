@@ -62,7 +62,8 @@
     goNext();
   });
 
-  // Google
+  // Google (sağlayıcı açık değilse düğmeleri gizle)
+  if (!BD.GOOGLE) $$(".btn-google, .or").forEach(function (e) { e.hidden = true; });
   $$(".btn-google").forEach(function (b) {
     b.addEventListener("click", async function () {
       try { sessionStorage.setItem("bd_kind", kind || ""); } catch (e) {}

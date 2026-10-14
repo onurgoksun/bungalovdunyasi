@@ -173,6 +173,7 @@ begin
   return v is not null;
 end $$;
 revoke execute on function public.ai_take(uuid, int) from public, anon, authenticated;
+grant execute on function public.ai_take(uuid, int) to service_role;
 
 -- ---------------------------------------------------------------- Fotoğraf deposu
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

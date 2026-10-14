@@ -12,6 +12,7 @@
     URL: URL_,
     KEY: KEY,
     BUCKET: "tesis-foto",
+    GOOGLE: false,   // Google ile giriş Supabase'de açılınca true yapılır
     AMENITIES: ["Özel havuz", "Isıtmalı havuz", "Ortak havuz", "Açık hava jakuzisi", "İç mekân jakuzisi", "Şömine",
       "Tam donanımlı mutfak", "Klima", "Yerden ısıtma", "Wi-Fi", "Smart TV", "Mangal / barbekü", "Ateş çukuru",
       "Bahçe", "Göl manzarası", "Orman manzarası", "Özel otopark", "Kahvaltı imkânı", "Çocuklara uygun", "Engelli erişimine uygun"],

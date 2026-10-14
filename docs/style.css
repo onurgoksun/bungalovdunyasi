@@ -16,6 +16,7 @@
   --read: 68ch;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--paper); color: var(--text); font: 18px/1.7 var(--body); -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; display: block; }
