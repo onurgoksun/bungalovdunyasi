@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giriş yap / Üye ol – Bungalov Dünyası</title>
+<meta name="description" content="Bungalov Dünyası&#x27;na ücretsiz üye olun: tesis sahipleri tesisini ekler, tatilciler favorilerini kaydeder.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://bungalovdunyasi.tr/uye/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bungalov Dünyası">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Giriş yap / Üye ol – Bungalov Dünyası">
+<meta property="og:description" content="Bungalov Dünyası&#x27;na ücretsiz üye olun: tesis sahipleri tesisini ekler, tatilciler favorilerini kaydeder.">
+<meta property="og:url" content="https://bungalovdunyasi.tr/uye/">
+<meta property="og:image" content="https://images.unsplash.com/photo-1576874748772-584aa2bee2d4?auto=format&fit=crop&w=1200&h=630&q=72">
+<meta name="theme-color" content="#15302b">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css?v=4">
+<link rel="preconnect" href="https://images.unsplash.com">
+</head>
+<body>
+<a class="skip" href="#icerik">İçeriğe geç</a>
+<header class="top"><div class="wrap">
+  <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
+  <nav class="nav" aria-label="Ana menü"><a href="/tesisler/">Tesisler</a><a href="/rehber/">Rehber</a><a href="/uygulama/">İşletmeciler için</a><a href="/hakkimizda/">Hakkımızda</a><a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
+</div></header>
+<main id="icerik">
+
+<div class="wrap"><nav class="crumbs" aria-label="Konum"><a href="/">Ana sayfa</a> / Üyelik</nav>
+<div class="auth-grid">
+<section class="auth-card">
+  <div class="tabs" role="tablist"><button type="button" role="tab" data-panel="p-giris">Giriş yap</button><button type="button" role="tab" data-panel="p-kayit">Üye ol</button></div>
+  <div id="uye-msg" class="msg" role="status" hidden></div>
+
+  <div id="p-giris" class="uye-panel">
+    <h1>Giriş yapın</h1>
+    <button type="button" class="btn-google"><svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Google ile devam edin</button>
+    <p class="or"><span>ya da e-posta ile</span></p>
+    <form id="f-giris">
+      <label class="fld" for="g-email"><span>E-posta</span><input id="g-email" type="email" required autocomplete="email"></label>
+      <label class="fld" for="g-sifre"><span>Şifre</span><input id="g-sifre" type="password" required autocomplete="current-password"></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Giriş yap</button><a href="#" id="sifre-unuttum">Şifremi unuttum</a></div>
+    </form>
+  </div>
+
+  <div id="p-kayit" class="uye-panel" hidden>
+    <h1>Ücretsiz üye olun</h1>
+    <form id="f-kayit">
+      <fieldset class="kind"><legend>Üyelik türü</legend>
+  <label class="kind-card"><input type="radio" name="kind" value="kurumsal"><span><strong>Kurumsal üyelik</strong>Tesis sahibiyim. Tesisimi ekleyip yönetmek istiyorum.</span></label>
+  <label class="kind-card"><input type="radio" name="kind" value="kisisel"><span><strong>Kişisel üyelik</strong>Tatil için bungalov arıyorum. Beğendiklerimi kaydetmek istiyorum.</span></label>
+</fieldset>
+      <button type="button" class="btn-google"><svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Google ile üye olun</button>
+      <p class="or"><span>ya da e-posta ile</span></p>
+      <label class="fld" for="k-ad"><span>Ad soyad</span><input id="k-ad" type="text" required autocomplete="name" maxlength="80"></label>
+      <div class="only-kurumsal" hidden>
+        <label class="fld" for="k-firma"><span>Tesisinizin adı</span><input id="k-firma" type="text" maxlength="200" placeholder="ör. Göl Evi Bungalov"><small class="hint">Birden fazla tesisiniz varsa virgülle ayırın.</small></label>
+        <label class="fld" for="k-tel"><span>Cep telefonu</span><input id="k-tel" type="tel" autocomplete="tel" maxlength="20" placeholder="05xx xxx xx xx"></label>
+      </div>
+      <label class="fld" for="k-email"><span>E-posta</span><input id="k-email" type="email" required autocomplete="email"></label>
+      <label class="fld" for="k-sifre"><span>Şifre</span><input id="k-sifre" type="password" required minlength="8" autocomplete="new-password"><small class="hint">En az 8 karakter.</small></label>
+      <label class="chk-line"><input type="checkbox" id="k-kvkk"><span><a href="/uyelik-kosullari/" target="_blank">Üyelik koşullarını</a> kabul ediyorum, <a href="/kvkk/" target="_blank">aydınlatma metnini</a> okudum.</span></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Üye ol</button></div>
+    </form>
+  </div>
+
+  <div id="p-tamamla" class="uye-panel" hidden>
+    <h1>Son bir adım</h1>
+    <p>Hesabınız oluştu. Üyelik türünüzü seçip bilgilerinizi tamamlayın.</p>
+    <form id="f-tamamla">
+      <fieldset class="kind"><legend>Üyelik türü</legend>
+  <label class="kind-card"><input type="radio" name="kind2" value="kurumsal"><span><strong>Kurumsal üyelik</strong>Tesis sahibiyim. Tesisimi ekleyip yönetmek istiyorum.</span></label>
+  <label class="kind-card"><input type="radio" name="kind2" value="kisisel"><span><strong>Kişisel üyelik</strong>Tatil için bungalov arıyorum. Beğendiklerimi kaydetmek istiyorum.</span></label>
+</fieldset>
+      <label class="fld" for="t-ad"><span>Ad soyad</span><input id="t-ad" type="text" required autocomplete="name" maxlength="80"></label>
+      <div class="only-kurumsal" hidden>
+        <label class="fld" for="t-firma"><span>Tesisinizin adı</span><input id="t-firma" type="text" maxlength="200"><small class="hint">Birden fazla tesisiniz varsa virgülle ayırın.</small></label>
+        <label class="fld" for="t-tel"><span>Cep telefonu</span><input id="t-tel" type="tel" autocomplete="tel" maxlength="20"></label>
+      </div>
+      <label class="chk-line"><input type="checkbox" id="t-kvkk"><span><a href="/uyelik-kosullari/" target="_blank">Üyelik koşullarını</a> kabul ediyorum, <a href="/kvkk/" target="_blank">aydınlatma metnini</a> okudum.</span></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Devam</button></div>
+    </form>
+  </div>
+
+  <div id="p-sifre" class="uye-panel" hidden>
+    <h1>Şifrenizi mi unuttunuz?</h1>
+    <p>E-posta adresinizi yazın, şifrenizi yenilemeniz için bir bağlantı gönderelim.</p>
+    <form id="f-sifre">
+      <label class="fld" for="s-email"><span>E-posta</span><input id="s-email" type="email" required autocomplete="email"></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Bağlantı gönder</button><a href="#" class="back-giris">Girişe dön</a></div>
+    </form>
+  </div>
+
+  <div id="p-yeni" class="uye-panel" hidden>
+    <h1>Yeni şifre</h1>
+    <form id="f-yeni">
+      <label class="fld" for="y-sifre"><span>Yeni şifreniz</span><input id="y-sifre" type="password" required minlength="8" autocomplete="new-password"><small class="hint">En az 8 karakter.</small></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Şifreyi kaydet</button></div>
+    </form>
+  </div>
+
+  <div id="p-dogrula" class="uye-panel" hidden>
+    <h1>E-postanızı doğrulayın</h1>
+    <p><strong id="dogrula-email"></strong> adresine bir doğrulama bağlantısı gönderdik. Bağlantıya tıkladığınızda üyeliğiniz tamamlanır ve kaldığınız yerden devam edersiniz.</p>
+    <p class="hint">E-posta birkaç dakika içinde gelmezse gereksiz (spam) klasörüne bakın.</p>
+    <p><a href="#" class="back-giris">Girişe dön</a></p>
+  </div>
+</section>
+
+<aside class="auth-side">
+  <h2>Tesis sahipleri için</h2>
+  <ul class="ticks">
+    <li>Tesisinizi kendiniz ekleyin; kaydettiğiniz anda yayında</li>
+    <li>Fotoğraflar, olanaklar, kurallar ve harita konumu</li>
+    <li>Tanıtım yazısını yapay zekâ yardımcısıyla birkaç saniyede hazırlayın</li>
+    <li>Misafir size doğrudan ulaşır, komisyon yok</li>
+    <li>Ücretsiz <a href="/uygulama/">Bungalov Yönetim</a> uygulaması</li>
+  </ul>
+  <h2>Tatilciler için</h2>
+  <ul class="ticks">
+    <li>Beğendiğiniz bungalovları favorilerinize kaydedin</li>
+    <li>Rezervasyonu doğrudan tesisle, komisyonsuz yapın</li>
+  </ul>
+</aside>
+</div>
+</div>
+
+</main>
+<footer class="foot"><div class="wrap">
+  <div>
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
+    <p>Sapanca ve çevresinde bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
+  </div>
+  <div>
+    <h4>Sayfalar</h4>
+    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li></ul>
+  </div>
+  <div>
+    <h4>İletişim</h4>
+    <ul><li><a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20hakk%C4%B1nda%20yaz%C4%B1yorum." rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+905327222545">0532 722 25 45</a></li><li><a href="/kvkk/">Kişisel veriler (KVKK)</a></li><li><a href="/uyelik-kosullari/">Üyelik koşulları</a></li></ul>
+  </div>
+  <p class="small">© 2026 Bungalov Dünyası. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
+</div></footer>
+<script>try{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}catch(e){}</script>
+<script src="/js/vendor/supabase-2.117.0.js"></script>
+<script src="/js/core.js?v=4"></script>
+<script src="/js/uye.js?v=4"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e4d1630b9947485b835f8b18c6dd0d75"}'></script>
+</body>
+</html>

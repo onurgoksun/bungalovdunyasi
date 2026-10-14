@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Bungalov Dünyası statik site üreticisi. Çalıştır: python3 build.py  → ./docs/"""
-import html, json, os, shutil, datetime
+import html, json, os, re, shutil, datetime, urllib.request
 from urllib.parse import quote
 
 SITE = "https://bungalovdunyasi.tr"
@@ -56,8 +56,17 @@ def cover(key):
 NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/uygulama/", "İşletmeciler için"), ("/hakkimizda/", "Hakkımızda")]
 
 
-def page(path, title, desc, body, schema=None, active=None, og_image=None):
+JSV = "4"
+SB_JS = "/js/vendor/supabase-2.117.0.js"
+
+
+def page(path, title, desc, body, schema=None, active=None, og_image=None, scripts=None, noindex=False):
     canonical = SITE + path
+    js = ""
+    if scripts:
+        js = f'<script src="{SB_JS}"></script>\n<script src="/js/core.js?v={JSV}"></script>\n' + \
+            "".join(f'<script src="/js/{n}.js?v={JSV}"></script>\n' for n in scripts)
+    robots = '<meta name="robots" content="noindex">\n' if noindex else ""
     nav = "".join(
         f'<a href="{h}"{" aria-current=\"page\"" if active == h else ""}>{t}</a>' for h, t in NAV)
     ld = ""
@@ -71,7 +80,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{canonical}">
+{robots}<link rel="canonical" href="{canonical}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{NAME}">
 <meta property="og:locale" content="tr_TR">
@@ -84,14 +93,14 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=3">
+<link rel="stylesheet" href="/style.css?v=4">
 <link rel="preconnect" href="https://images.unsplash.com">
 {ld}</head>
 <body>
 <a class="skip" href="#icerik">İçeriğe geç</a>
 <header class="top"><div class="wrap">
   <a class="logo" href="/">{LOGO_SVG}{NAME}</a>
-  <nav class="nav" aria-label="Ana menü">{nav}<a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
+  <nav class="nav" aria-label="Ana menü">{nav}<a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
 </div></header>
 <main id="icerik">
 {body}
@@ -103,15 +112,16 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None):
   </div>
   <div>
     <h4>Sayfalar</h4>
-    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li></ul>
+    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li></ul>
   </div>
   <div>
     <h4>İletişim</h4>
-    <ul><li><a href="{wa('Merhaba, Bungalov Dünyası hakkında yazıyorum.')}" rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+{WA}">0532 722 25 45</a></li></ul>
+    <ul><li><a href="{wa('Merhaba, Bungalov Dünyası hakkında yazıyorum.')}" rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+{WA}">0532 722 25 45</a></li><li><a href="/kvkk/">Kişisel veriler (KVKK)</a></li><li><a href="/uyelik-kosullari/">Üyelik koşulları</a></li></ul>
   </div>
   <p class="small">© {datetime.date.today().year} {NAME}. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
 </div></footer>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{{"token": "e4d1630b9947485b835f8b18c6dd0d75"}}'></script>
+<script>try{{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){{var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}}}catch(e){{}}</script>
+{js}<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{{"token": "e4d1630b9947485b835f8b18c6dd0d75"}}'></script>
 </body>
 </html>
 """
@@ -171,7 +181,7 @@ def fac_row(f):
                     for s, a in f["shots"])
     tags = "".join(f'<li class="{c}">{esc(t)}</li>' for t, c in f["tags"])
     url = f'/tesisler/{f["slug"]}/'
-    return f"""<article class="fac">
+    return f"""<article class="fac" data-slug="{f['slug']}">
   <a class="shots" href="{url}" tabindex="-1" aria-hidden="true">{shots}</a>
   <div>
     <h3><a href="{url}">{esc(f["name"])}</a></h3>
@@ -206,6 +216,226 @@ for _fn in sorted(os.listdir(CONTENT)):
                        faq=[(x["q"], x["a"]) for x in _d.get("faq", [])]))
 GUIDES.sort(key=lambda g: (g["date"], g["slug"]), reverse=True)
 
+# ---------------------------------------------------------------- Üyelerin eklediği tesisler
+# Yayındaki ilanlar Supabase'den okunur ve content/ilanlar.json'a yazılır. Okunamazsa (ağ yoksa)
+# son kaydedilen liste kullanılır. GitHub Actions düzenli aralıklarla yeniden üretir.
+SB_URL = "https://sbqjblbiwivytybtlxdi.supabase.co"
+SB_KEY = "sb_publishable_YeZQ1VWS7RrQMxW5Ubrykg_7q_k0N9A"
+LISTINGS_CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "content", "ilanlar.json")
+RESERVED = {"labella-bungalov"}
+
+
+def load_listings():
+    cols = ("slug,name,summary,description,district,neighborhood,address,units,capacity,beds,amenities,pets,checkin,checkout,"
+            "rules,phone,whatsapp,website,booking_url,instagram,photos,created_at,updated_at")
+    url = f"{SB_URL}/rest/v1/listings?status=eq.yayinda&select={cols}&order=created_at.desc&limit=1000"
+    try:
+        req = urllib.request.Request(url, headers={"apikey": SB_KEY, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.load(r)
+        if not isinstance(data, list):
+            raise ValueError("beklenmeyen yanıt")
+        with open(LISTINGS_CACHE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1, sort_keys=True)
+            f.write("\n")
+        print(f"ilanlar: {len(data)} (Supabase)")
+    except Exception as e:  # ağ yoksa son kayıt
+        data = []
+        if os.path.exists(LISTINGS_CACHE):
+            with open(LISTINGS_CACHE, encoding="utf-8") as f:
+                data = json.load(f)
+        print(f"ilanlar: {len(data)} (önbellek; Supabase okunamadı: {type(e).__name__})")
+    out = []
+    for l in data:
+        slug = str(l.get("slug") or "")
+        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", slug) or slug in RESERVED:
+            continue
+        l["photos"] = [p for p in (l.get("photos") or []) if isinstance(p, dict) and isinstance(p.get("path"), str)]
+        out.append(l)
+    return out
+
+
+LISTINGS = load_listings()
+PETS = {"evet": "Evcil hayvan kabul edilir", "hayir": "Evcil hayvan kabul edilmez", "sor": "Evcil hayvan için önceden sorun"}
+
+
+def photo_url(path):
+    return f"{SB_URL}/storage/v1/object/public/tesis-foto/" + "/".join(quote(x) for x in path.split("/"))
+
+
+def safe_url(u):
+    u = str(u or "").strip()
+    if not u:
+        return ""
+    if not re.match(r"https?://", u, re.I):
+        u = "https://" + u
+    return u if re.match(r"https?://[^\s\"'<>]+$", u, re.I) else ""
+
+
+def with_utm(u):
+    u = safe_url(u)
+    return (u + ("&" if "?" in u else "?") + UTM) if u else ""
+
+
+def digits(p):
+    d = re.sub(r"\D", "", str(p or ""))
+    if len(d) == 11 and d[0] == "0":
+        d = "9" + d
+    if len(d) == 10:
+        d = "90" + d
+    return d
+
+
+def place_of(l):
+    return ", ".join(x for x in [l.get("neighborhood"), l.get("district")] if x)
+
+
+def full_address(l):
+    return ", ".join(x.strip() for x in [l.get("address") or "", l.get("neighborhood") or "", l.get("district") or "", "Sakarya"] if x.strip())
+
+
+def is_warm(a):
+    return bool(re.search(r"ısıtma|jakuzi|şömine", a, re.I))
+
+
+def listing_row(l):
+    url = f'/tesisler/{l["slug"]}/'
+    ph = l["photos"][:3]
+    use = ph if len(ph) == 3 else ph[:1]
+    shots = "".join(f'<img src="{photo_url(p["path"])}" alt="" loading="lazy">' for p in use)
+    tags = [f'<li class="{"warm" if is_warm(a) else ""}">{esc(a)}</li>' for a in (l.get("amenities") or [])[:5]]
+    if l.get("pets") == "evet":
+        tags.append("<li>Evcil hayvan kabul edilir</li>")
+    summary = f'<p>{esc(l["summary"])}</p>' if l.get("summary") else ""
+    tag_html = f'<ul class="tags" aria-label="Öne çıkan olanaklar">{"".join(tags)}</ul>' if tags else ""
+    return f"""<article class="fac" data-slug="{esc(l['slug'])}">
+  <a class="shots{'' if len(ph) == 3 else ' one'}" href="{url}" tabindex="-1" aria-hidden="true">{shots}</a>
+  <div>
+    <h3><a href="{url}">{esc(l["name"])}</a></h3>
+    <p class="place">{esc(place_of(l))}</p>
+    {summary}
+    {tag_html}
+    <div class="actions"><a class="btn solid" href="{url}">Tesisi incele</a></div>
+  </div>
+</article>"""
+
+
+def paras(text):
+    out = []
+    for p in re.split(r"\n\s*\n", text or ""):
+        if p.strip():
+            out.append("<p>" + esc(re.sub(r"\s*\n\s*", " ", p.strip())) + "</p>")
+    return "".join(out)
+
+
+def build_listing(l):
+    path = f'/tesisler/{l["slug"]}/'
+    photos = l["photos"]
+    name = l["name"]
+    place = place_of(l)
+    tags = [f'<li class="{"warm" if is_warm(a) else ""}">{esc(a)}</li>' for a in (l.get("amenities") or [])[:6]]
+    if l.get("pets") == "evet":
+        tags.append("<li>Evcil hayvan kabul edilir</li>")
+    gcls = "gallery" + (" n1" if len(photos) == 1 else " few" if len(photos) < 5 else "")
+    gal = "".join(f'<a href="{photo_url(p["path"])}" target="_blank" rel="noopener"><img src="{photo_url(p["path"])}" '
+                  f'alt="{esc((p.get("alt") + " — ") if p.get("alt") else "")}{esc(name)}" loading="{"eager" if i == 0 else "lazy"}"></a>'
+                  for i, p in enumerate(photos[:9]))
+    more = ""
+    if len(photos) > 9:
+        rest = "".join(f'<a href="{photo_url(p["path"])}" target="_blank" rel="noopener"><img src="{photo_url(p["path"])}" alt="{esc(p.get("alt") or name)}" loading="lazy"></a>' for p in photos[9:])
+        more = f'<details class="more-photos"><summary>Bütün fotoğraflar ({len(photos)})</summary><div class="gallery">{rest}</div></details>'
+    facts = []
+    if l.get("units"):
+        facts.append(("Bungalov sayısı", str(l["units"])))
+    if l.get("capacity"):
+        facts.append(("Kapasite", l["capacity"]))
+    if l.get("beds"):
+        facts.append(("Yatak", l["beds"]))
+    if l.get("checkin") or l.get("checkout"):
+        facts.append(("Giriş / çıkış", f'{l.get("checkin") or "—"} / {l.get("checkout") or "—"}'))
+    facts_html = ('<dl class="facts">' + "".join(f"<div><dt>{esc(a)}</dt><dd>{esc(b)}</dd></div>" for a, b in facts) + "</dl>") if facts else ""
+    desc = f'<h2>Tesis hakkında</h2>{paras(l.get("description"))}' if l.get("description") else ""
+    amen = ""
+    if l.get("amenities"):
+        amen = '<h2>Olanaklar</h2><ul class="amen">' + "".join(f"<li>{esc(a)}</li>" for a in l["amenities"]) + "</ul>"
+    rules = [re.sub(r"^[-•*]\s*", "", x.strip()) for x in (l.get("rules") or "").split("\n") if x.strip()]
+    if l.get("pets") in PETS:
+        rules.append(PETS[l["pets"]] + ".")
+    rules_html = ('<h2>Bilmeniz gerekenler</h2><ul>' + "".join(f"<li>{esc(r)}</li>" for r in rules) + "</ul>") if rules else ""
+    q = full_address(l)
+    loc = ""
+    if l.get("address") or l.get("neighborhood"):
+        loc = (f'<h2>Konum</h2><p>{esc(q)}. <a href="https://www.google.com/maps/search/?api=1&amp;query={quote(name + ", " + q)}" rel="noopener" target="_blank">Haritada aç</a></p>'
+               f'<div class="map"><iframe src="https://maps.google.com/maps?q={quote(q)}&amp;z=14&amp;output=embed" title="{esc(name)} konumu" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>')
+    report = wa(f"Merhaba, Bungalov Dünyası'ndaki şu tesis sayfasıyla ilgili bildirim yapmak istiyorum: {SITE}{path}")
+    btns = ""
+    if l.get("booking_url") and with_utm(l["booking_url"]):
+        btns += f'<a class="btn solid" href="{esc(with_utm(l["booking_url"]))}" rel="noopener nofollow" target="_blank">Takvimi ve fiyatı gör</a>'
+    w = digits(l.get("whatsapp") or l.get("phone"))
+    if len(w) >= 11:
+        msg = quote(f"Merhaba, Bungalov Dünyası'ndan ulaşıyorum. {name} için müsaitlik sormak istiyorum: [giriş] – [çıkış], [kişi sayısı] kişi.")
+        btns += f'<a class="btn wa" href="https://wa.me/{w}?text={msg}" rel="noopener">WhatsApp\'tan sor</a>'
+    t = digits(l.get("phone") or l.get("whatsapp"))
+    if len(t) >= 11:
+        btns += f'<a class="btn line" href="tel:+{t}">Ara: {esc(l.get("phone") or l.get("whatsapp"))}</a>'
+    links = []
+    if l.get("website") and safe_url(l["website"]):
+        links.append(f'<a href="{esc(with_utm(l["website"]))}" rel="noopener nofollow" target="_blank">Web sitesi</a>')
+    if l.get("instagram"):
+        ig = re.sub(r"[^A-Za-z0-9._]", "", l["instagram"])
+        if ig:
+            links.append(f'<a href="https://instagram.com/{ig}" rel="noopener nofollow" target="_blank">Instagram: @{ig}</a>')
+    links_html = f'<p style="margin:14px 0 0;font-size:15px">{" · ".join(links)}</p>' if links else ""
+    body = f"""
+<div class="wrap">{crumbs([("/tesisler/", "Tesisler"), (None, name)])}
+<header class="page-head"><h1>{esc(name)}</h1>
+{f'<p class="place" style="margin-top:10px">{esc(place)}</p>' if place else ""}
+{f'<p>{esc(l["summary"])}</p>' if l.get("summary") else ""}
+{f'<ul class="tags" style="margin-top:18px">{"".join(tags)}</ul>' if tags else ""}
+<div class="fav-row" id="fav-slot" data-slug="{esc(l['slug'])}"></div>
+</header>
+{f'<div class="{gcls}">{gal}</div>' if photos else ""}{more}
+<div class="layout">
+<div class="prose">
+  {facts_html}
+  {desc}
+  {amen}
+  {rules_html}
+  {loc}
+  <p class="disclose">Bu sayfadaki bilgiler ve fotoğraflar tesis sahibi tarafından eklendi. Fiyat ve müsaitlik için tesisle doğrudan görüşün. Hatalı ya da yanıltıcı bir bilgi görürseniz <a href="{report}" rel="noopener">bize bildirin</a>.</p>
+</div>
+<aside class="aside" aria-label="İletişim">
+  <h3>Müsaitlik ve fiyat</h3>
+  <p>Fiyat ve boş tarihler için tesisle doğrudan iletişime geçin. Komisyon yok.</p>
+  {btns}
+  {links_html}
+</aside>
+</div>
+</div>
+"""
+    lodging = {"@context": "https://schema.org", "@type": "LodgingBusiness", "name": name, "url": SITE + path,
+               "address": {"@type": "PostalAddress", "addressLocality": l.get("district") or "Sapanca", "addressRegion": "Sakarya", "addressCountry": "TR"}}
+    if l.get("summary"):
+        lodging["description"] = l["summary"]
+    if photos:
+        lodging["image"] = [photo_url(p["path"]) for p in photos[:5]]
+    if t:
+        lodging["telephone"] = "+" + t
+    if l.get("address"):
+        lodging["address"]["streetAddress"] = ", ".join(x for x in [l["address"], l.get("neighborhood")] if x)
+    if l.get("checkin"):
+        lodging["checkinTime"] = l["checkin"]
+    if l.get("checkout"):
+        lodging["checkoutTime"] = l["checkout"]
+    if l.get("units"):
+        lodging["numberOfRooms"] = l["units"]
+    if l.get("amenities"):
+        lodging["amenityFeature"] = [{"@type": "LocationFeatureSpecification", "name": a, "value": True} for a in l["amenities"]]
+    title = f"{name} – {place + ' ' if place else ''}Bungalov | Bungalov Dünyası"
+    desc_meta = (l.get("summary") or f"{name}: fotoğraflar, olanaklar ve doğrudan iletişim bilgileri.")[:160]
+    write(path, page(path, title, desc_meta, body, [lodging, crumbs_ld([("/tesisler/", "Tesisler"), (path, name)])],
+                     active="/tesisler/", og_image=photo_url(photos[0]["path"]) if photos else None, scripts=["fav"]))
+
 
 # ---------------------------------------------------------------- Sayfalar
 def build_home():
@@ -230,6 +460,8 @@ def build_home():
 <section class="block"><div class="wrap">
   <div class="head"><h2>Tesisler</h2><p>Her tesisi tek tek tanıyoruz. Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan bungalovlar giriyor.</p></div>
   {fac_row(LABELLA)}
+  {"".join(listing_row(l) for l in LISTINGS[:3])}
+  {f'<p class="more-link"><a class="btn line" href="/tesisler/">Bütün tesisler ({len(LISTINGS) + 1})</a></p>' if len(LISTINGS) > 3 else ""}
   {SLOT}
 </div></section>
 
@@ -262,11 +494,12 @@ def owner_band():
   </div>
   <div>
     <ul>
-      <li>Fotoğraflı, ayrıntılı tesis sayfası</li>
+      <li>Ücretsiz üye olun, tesisinizi kendiniz ekleyin; sayfanız hemen yayında</li>
+      <li>Tanıtım yazısı için yapay zekâ yardımcısı</li>
       <li>Ücretsiz Bungalov Yönetim uygulaması: takvim, rezervasyon ve misafir mesajları tek yerde</li>
       <li>Kendi web sitenize ekleyebileceğiniz rezervasyon sayfası</li>
     </ul>
-    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Nasıl eklenir?</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
+    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Tesisinizi ekleyin</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
   </div>
 </div></section>"""
 
@@ -279,13 +512,16 @@ def build_facilities():
 <p>Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan tesisleri ekliyoruz. Fiyat ve müsaitlik için tesisle doğrudan görüşürsünüz.</p></header>
 </div>
 <section class="block" style="padding-top:12px"><div class="wrap">
+  <div id="uye-tesisler" class="fac-list">
   {fac_row(LABELLA)}
+  {"".join(listing_row(l) for l in LISTINGS)}
+  </div>
   {SLOT}
 </div></section>
 """
     write("/tesisler/", page("/tesisler/", "Sapanca Bungalov Tesisleri – Bungalov Dünyası",
                              "Sapanca'da özel havuzlu, jakuzili ve şömineli bungalov tesisleri. Fotoğraflar, olanaklar ve doğrudan iletişim bilgileri.",
-                             body, [crumbs_ld([("/tesisler/", "Tesisler")])], active="/tesisler/"))
+                             body, [crumbs_ld([("/tesisler/", "Tesisler")])], active="/tesisler/", scripts=["tesisler"]))
 
 
 def build_labella():
@@ -401,48 +637,361 @@ def build_guides():
         write(path, page(path, g["seo_title"] + " | Bungalov Dünyası", g["desc"], body, schema, active="/rehber/", og_image=ux(g["img"], 1200, 630)))
 
 
-def build_owner():
-    msg = wa("Merhaba, Sapanca'daki bungalov tesisimi Bungalov Dünyası'na eklemek istiyorum. Tesis adı: [ ], bungalov sayısı: [ ].")
+def field(id_, label, kind="text", hint="", attrs="", wide=False):
+    """Form alanı: etiket + girdi + isteğe bağlı açıklama."""
+    h = f'<small class="hint">{hint}</small>' if hint else ""
+    if kind == "textarea":
+        inp = f'<textarea id="{id_}" {attrs}></textarea>'
+    elif kind == "select":
+        inp = f'<select id="{id_}">{attrs}</select>'
+    else:
+        inp = f'<input id="{id_}" type="{kind}" {attrs}>'
+    return f'<label class="fld{" wide" if wide else ""}" for="{id_}"><span>{label}</span>{inp}{h}</label>'
+
+
+def ai_bar(target, task, label="Yapay zekâ ile yaz"):
+    return (f'<div class="ai-bar"><button type="button" class="ai" data-ai="{task}" data-target="#{target}">✦ {label}</button>'
+            f'<button type="button" class="ai soft" data-ai="improve" data-target="#{target}">Yazımı düzelt</button>'
+            f'<span class="count" id="{target}-n"></span></div>')
+
+
+KVKK_LINE = ('<a href="/uyelik-kosullari/" target="_blank">Üyelik koşullarını</a> kabul ediyorum, '
+             '<a href="/kvkk/" target="_blank">aydınlatma metnini</a> okudum.')
+GOOGLE_SVG = ('<svg viewBox="0 0 48 48" aria-hidden="true" width="20" height="20"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/>'
+              '<path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>'
+              '<path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/>'
+              '<path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>')
+
+
+def kind_cards(name):
+    return f"""<fieldset class="kind"><legend>Üyelik türü</legend>
+  <label class="kind-card"><input type="radio" name="{name}" value="kurumsal"><span><strong>Kurumsal üyelik</strong>Tesis sahibiyim. Tesisimi ekleyip yönetmek istiyorum.</span></label>
+  <label class="kind-card"><input type="radio" name="{name}" value="kisisel"><span><strong>Kişisel üyelik</strong>Tatil için bungalov arıyorum. Beğendiklerimi kaydetmek istiyorum.</span></label>
+</fieldset>"""
+
+
+def build_member():
     body = f"""
-<div class="wrap">{crumbs([(None, "Tesisinizi ekleyin")])}
-<header class="page-head"><h1>Tesisinizi ücretsiz ekleyin</h1>
-<p>Sapanca ve çevresinde bungalov işletiyorsanız tesisinizi rehbere ekleyelim. Misafir size doğrudan ulaşır; komisyon ya da listeleme ücreti yok.</p></header>
-{cover("inside")}
-<div class="layout">
-<div class="prose">
-  <h2>Ne kazanırsınız?</h2>
-  <ul>
-    <li><strong>Tesis sayfası:</strong> Fotoğraflarınız, olanaklarınız, kurallarınız ve doğrudan iletişim butonlarınız.</li>
-    <li><strong>Doğrudan misafir:</strong> Misafir WhatsApp'tan ya da telefonla size yazar. Rezervasyonu ve ödemeyi kendiniz yönetirsiniz.</li>
-    <li><strong>Bungalov Yönetim uygulaması, ücretsiz:</strong> Bungalovlarınızın doluluk takvimi, rezervasyon ve kapora takibi, misafire hazır WhatsApp mesajları, çıkış sonrası misafir anketi. Windows, Android, iPhone ve iPad'de çalışır. <a href="/uygulama/">Uygulamayı inceleyin</a>.</li>
-    <li><strong>Kendi rezervasyon sayfanız:</strong> Misafirin boş tarihleri görüp talep bırakabildiği, kendi sitenize ve Instagram'ınıza ekleyebileceğiniz bir sayfa.</li>
+<div class="wrap">{crumbs([(None, "Üyelik")])}
+<div class="auth-grid">
+<section class="auth-card">
+  <div class="tabs" role="tablist"><button type="button" role="tab" data-panel="p-giris">Giriş yap</button><button type="button" role="tab" data-panel="p-kayit">Üye ol</button></div>
+  <div id="uye-msg" class="msg" role="status" hidden></div>
+
+  <div id="p-giris" class="uye-panel">
+    <h1>Giriş yapın</h1>
+    <button type="button" class="btn-google">{GOOGLE_SVG}Google ile devam edin</button>
+    <p class="or"><span>ya da e-posta ile</span></p>
+    <form id="f-giris">
+      {field("g-email", "E-posta", "email", attrs='required autocomplete="email"')}
+      {field("g-sifre", "Şifre", "password", attrs='required autocomplete="current-password"')}
+      <div class="form-actions"><button class="btn solid" type="submit">Giriş yap</button><a href="#" id="sifre-unuttum">Şifremi unuttum</a></div>
+    </form>
+  </div>
+
+  <div id="p-kayit" class="uye-panel" hidden>
+    <h1>Ücretsiz üye olun</h1>
+    <form id="f-kayit">
+      {kind_cards("kind")}
+      <button type="button" class="btn-google">{GOOGLE_SVG}Google ile üye olun</button>
+      <p class="or"><span>ya da e-posta ile</span></p>
+      {field("k-ad", "Ad soyad", attrs='required autocomplete="name" maxlength="80"')}
+      <div class="only-kurumsal" hidden>
+        {field("k-firma", "Tesisinizin adı", hint="Birden fazla tesisiniz varsa virgülle ayırın.", attrs='maxlength="200" placeholder="ör. Göl Evi Bungalov"')}
+        {field("k-tel", "Cep telefonu", "tel", attrs='autocomplete="tel" maxlength="20" placeholder="05xx xxx xx xx"')}
+      </div>
+      {field("k-email", "E-posta", "email", attrs='required autocomplete="email"')}
+      {field("k-sifre", "Şifre", "password", hint="En az 8 karakter.", attrs='required minlength="8" autocomplete="new-password"')}
+      <label class="chk-line"><input type="checkbox" id="k-kvkk"><span>{KVKK_LINE}</span></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Üye ol</button></div>
+    </form>
+  </div>
+
+  <div id="p-tamamla" class="uye-panel" hidden>
+    <h1>Son bir adım</h1>
+    <p>Hesabınız oluştu. Üyelik türünüzü seçip bilgilerinizi tamamlayın.</p>
+    <form id="f-tamamla">
+      {kind_cards("kind2")}
+      {field("t-ad", "Ad soyad", attrs='required autocomplete="name" maxlength="80"')}
+      <div class="only-kurumsal" hidden>
+        {field("t-firma", "Tesisinizin adı", hint="Birden fazla tesisiniz varsa virgülle ayırın.", attrs='maxlength="200"')}
+        {field("t-tel", "Cep telefonu", "tel", attrs='autocomplete="tel" maxlength="20"')}
+      </div>
+      <label class="chk-line"><input type="checkbox" id="t-kvkk"><span>{KVKK_LINE}</span></label>
+      <div class="form-actions"><button class="btn solid" type="submit">Devam</button></div>
+    </form>
+  </div>
+
+  <div id="p-sifre" class="uye-panel" hidden>
+    <h1>Şifrenizi mi unuttunuz?</h1>
+    <p>E-posta adresinizi yazın, şifrenizi yenilemeniz için bir bağlantı gönderelim.</p>
+    <form id="f-sifre">
+      {field("s-email", "E-posta", "email", attrs='required autocomplete="email"')}
+      <div class="form-actions"><button class="btn solid" type="submit">Bağlantı gönder</button><a href="#" class="back-giris">Girişe dön</a></div>
+    </form>
+  </div>
+
+  <div id="p-yeni" class="uye-panel" hidden>
+    <h1>Yeni şifre</h1>
+    <form id="f-yeni">
+      {field("y-sifre", "Yeni şifreniz", "password", hint="En az 8 karakter.", attrs='required minlength="8" autocomplete="new-password"')}
+      <div class="form-actions"><button class="btn solid" type="submit">Şifreyi kaydet</button></div>
+    </form>
+  </div>
+
+  <div id="p-dogrula" class="uye-panel" hidden>
+    <h1>E-postanızı doğrulayın</h1>
+    <p><strong id="dogrula-email"></strong> adresine bir doğrulama bağlantısı gönderdik. Bağlantıya tıkladığınızda üyeliğiniz tamamlanır ve kaldığınız yerden devam edersiniz.</p>
+    <p class="hint">E-posta birkaç dakika içinde gelmezse gereksiz (spam) klasörüne bakın.</p>
+    <p><a href="#" class="back-giris">Girişe dön</a></p>
+  </div>
+</section>
+
+<aside class="auth-side">
+  <h2>Tesis sahipleri için</h2>
+  <ul class="ticks">
+    <li>Tesisinizi kendiniz ekleyin; kaydettiğiniz anda yayında</li>
+    <li>Fotoğraflar, olanaklar, kurallar ve harita konumu</li>
+    <li>Tanıtım yazısını yapay zekâ yardımcısıyla birkaç saniyede hazırlayın</li>
+    <li>Misafir size doğrudan ulaşır, komisyon yok</li>
+    <li>Ücretsiz <a href="/uygulama/">Bungalov Yönetim</a> uygulaması</li>
   </ul>
-  <h2>Nasıl eklenir?</h2>
-  <ol>
-    <li>Aşağıdaki butondan bize WhatsApp'tan yazın.</li>
-    <li>Tesisinizin fotoğraflarını ve temel bilgilerini (bungalov sayısı, kapasite, havuz, jakuzi, şömine, kurallar) gönderin.</li>
-    <li>Sayfanızı hazırlayıp onayınıza sunarız. Onaylarsanız yayına alırız.</li>
-  </ol>
-  <h2>Ölçütlerimiz</h2>
-  <ul>
-    <li>Fotoğraflar tesisin kendisine ait ve güncel olmalı.</li>
-    <li>Olanaklar doğru yazılmalı: "ısıtmalı havuz" yazıyorsa havuz gerçekten ısıtılıyor olmalı.</li>
-    <li>Misafirlerden gelen ciddi şikâyetlerde tesisle konuşur, gerekirse listeden çıkarırız.</li>
+  <h2>Tatilciler için</h2>
+  <ul class="ticks">
+    <li>Beğendiğiniz bungalovları favorilerinize kaydedin</li>
+    <li>Rezervasyonu doğrudan tesisle, komisyonsuz yapın</li>
   </ul>
-  <div class="note"><p>Şimdilik yalnızca Sapanca ve yakın çevresindeki (Kartepe, Maşukiye) tesisleri ekliyoruz.</p></div>
-</div>
-<aside class="aside" aria-label="Başvuru">
-  <h3>Başvuru</h3>
-  <p>Tesisinizin adını ve bungalov sayısını yazmanız yeterli. Size dönüş yaparız.</p>
-  <a class="btn wa" href="{msg}" rel="noopener">WhatsApp'tan başvurun</a>
-  <a class="btn line" href="tel:+{WA}">Ara: 0532 722 25 45</a>
 </aside>
 </div>
 </div>
 """
-    write("/tesis-ekle/", page("/tesis-ekle/", "Bungalov Tesisinizi Ücretsiz Ekleyin – Bungalov Dünyası",
-                               "Sapanca'da bungalov tesisinizi Bungalov Dünyası'na ücretsiz ekleyin. Komisyonsuz doğrudan misafir ve ücretsiz Bungalov Yönetim uygulaması.",
-                               body, [crumbs_ld([("/tesis-ekle/", "Tesisinizi ekleyin")])]))
+    write("/uye/", page("/uye/", "Giriş yap / Üye ol – Bungalov Dünyası", "Bungalov Dünyası'na ücretsiz üye olun: tesis sahipleri tesisini ekler, tatilciler favorilerini kaydeder.",
+                        body, scripts=["uye"], noindex=True))
+
+
+def build_account():
+    app_msg = wa("Merhaba, Bungalov Dünyası kurumsal üyesiyim. Bungalov Yönetim uygulamasını kurmak istiyorum.")
+    body = f"""
+<div class="wrap">{crumbs([(None, "Hesabım")])}
+<p id="hesap-yukleniyor" class="loading">Yükleniyor…</p>
+<div id="hesap" hidden>
+<header class="page-head"><h1>Hesabım</h1><p><span id="h-email"></span> · <span id="h-tur"></span></p></header>
+<div id="hesap-msg" class="msg" role="status" hidden></div>
+<div class="layout">
+<div class="acct-main">
+  <section id="kurumsal-bolum" hidden>
+    <div class="head"><h2>Tesislerim</h2><a class="btn solid" href="/tesis-ekle/">+ Yeni tesis ekle</a></div>
+    <div id="tesislerim" class="my-list"><p class="loading">Yükleniyor…</p></div>
+    <div class="note"><p><strong>Bungalov Yönetim uygulaması size ücretsiz.</strong> Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları ve ayın hesabı tek yerde. <a href="/uygulama/">Uygulamayı inceleyin</a> ya da kurulum için <a href="{app_msg}" rel="noopener">bize yazın</a>, birlikte kuralım.</p></div>
+  </section>
+  <section id="kisisel-bolum" hidden>
+    <div class="head"><h2>Favorilerim</h2></div>
+    <div id="favorilerim" class="my-list"><p class="loading">Yükleniyor…</p></div>
+    <div class="note"><p>Bungalov tesisiniz mi var? <button type="button" id="kurumsala-gec" class="linkish">Kurumsal üyeliğe geçin</button>, tesisinizi ücretsiz ekleyin.</p></div>
+  </section>
+</div>
+<aside class="aside">
+  <h3>Bilgilerim</h3>
+  <form id="f-profil">
+    {field("h-ad", "Ad soyad", attrs='maxlength="80" autocomplete="name"')}
+    {field("h-tel", "Telefon", "tel", attrs='maxlength="20" autocomplete="tel"')}
+    <div id="h-firma-satir">{field("h-firma", "Tesis adları", attrs='maxlength="200"')}</div>
+    <button class="btn solid" type="submit">Kaydet</button>
+  </form>
+  <button type="button" id="cikis" class="btn line">Çıkış yap</button>
+  <p class="hint" style="margin-top:14px">Hesabınızı silmek için <a href="{wa('Merhaba, Bungalov Dünyası hesabımı silmek istiyorum. E-posta adresim: ')}" rel="noopener">bize yazın</a>.</p>
+</aside>
+</div>
+</div>
+</div>
+"""
+    write("/hesabim/", page("/hesabim/", "Hesabım – Bungalov Dünyası", "Bungalov Dünyası üyelik hesabınız.", body, scripts=["hesabim"], noindex=True))
+
+
+def build_owner():
+    opts_d = "".join(f'<option>{d}</option>' for d in ["Sapanca", "Kartepe", "Serdivan", "Diğer"])
+    opts_p = '<option value="sor">Önceden sorulsun</option><option value="evet">Kabul edilir</option><option value="hayir">Kabul edilmez</option>'
+    body = f"""
+<div class="wrap">{crumbs([("/hesabim/", "Hesabım"), (None, "Tesis ekle")])}
+<header class="page-head"><h1 id="form-baslik">Tesisinizi ekleyin</h1>
+<p>Bilgileri doldurun, fotoğraflarınızı yükleyin. Kaydettiğiniz anda sayfanız yayına girer; istediğiniz zaman düzenleyebilirsiniz.</p></header>
+<p id="form-yukleniyor" class="loading">Yükleniyor…</p>
+<div id="kisisel-uyari" class="note" hidden><p>Tesis eklemek için kurumsal üyelik gerekiyor. <a href="/hesabim/">Hesabım</a> sayfasından tek tıkla kurumsal üyeliğe geçebilirsiniz.</p></div>
+
+<form id="tesis-form" class="tform" novalidate hidden>
+<section class="fsec">
+  <h2><span>1</span> Temel bilgiler</h2>
+  {field("f-name", "Tesisin adı", attrs='required maxlength="80" placeholder="ör. Göl Evi Bungalov"', wide=True)}
+  {field("f-summary", "Kısa tanıtım", "textarea", hint="Listede ve sayfanın başında görünür. 1-2 cümle.", attrs='rows="3" maxlength="300" data-max="300"', wide=True)}
+  {ai_bar("f-summary", "summary")}
+  <div class="grid3">
+    {field("f-units", "Bungalov sayısı", "number", attrs='min="1" max="200" inputmode="numeric"')}
+    {field("f-capacity", "Kapasite", attrs='maxlength="80" placeholder="ör. 2+1 kişi"')}
+    {field("f-beds", "Yatak düzeni", attrs='maxlength="120" placeholder="ör. 1 çift kişilik, 1 çekyat"')}
+  </div>
+</section>
+
+<section class="fsec">
+  <h2><span>2</span> Olanaklar</h2>
+  <p class="hint">Tesisinizde gerçekten olanları işaretleyin. Isıtmalı yazdıysanız havuz gerçekten ısıtılıyor olmalı.</p>
+  <div id="amenities" class="chk-grid"></div>
+  <div class="grid3">{field("f-pets", "Evcil hayvan", "select", attrs=opts_p)}</div>
+</section>
+
+<section class="fsec">
+  <h2><span>3</span> Tanıtım yazısı</h2>
+  {field("f-notes", "Yapay zekâ için notlarınız (isteğe bağlı)", "textarea", hint="Yazılmasını istediğiniz özellikleri kısaca yazın. Bu notlar sayfada görünmez; yalnızca yardımcı metni yazarken kullanır.", attrs='rows="3" maxlength="800" placeholder="ör. Göle 5 dakika yürüme mesafesi, her bungalovun kendi bahçesi var, kahvaltı kapıya geliyor."', wide=True)}
+  {field("f-description", "Açıklama", "textarea", hint="Bungalovları, olanakları, çevreyi ve kimlere uygun olduğunu anlatın. Paragraflar arasında boş satır bırakın.", attrs='rows="10" maxlength="6000" data-max="6000"', wide=True)}
+  {ai_bar("f-description", "description")}
+</section>
+
+<section class="fsec">
+  <h2><span>4</span> Fotoğraflar</h2>
+  <p class="hint">En fazla 20 fotoğraf. İlk fotoğraf kapak olur. Fotoğraflar yüklenirken otomatik küçültülür. Yalnızca tesisinize ait fotoğrafları kullanın.</p>
+  <div class="photo-bar"><button type="button" id="photo-pick" class="btn line">+ Fotoğraf ekle</button><span id="photo-count" class="count"></span><span id="photo-status" class="count"></span></div>
+  <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  <div id="photos" class="photo-grid"></div>
+</section>
+
+<section class="fsec">
+  <h2><span>5</span> Adres ve konum</h2>
+  <div class="grid3">
+    {field("f-district", "İlçe", "select", attrs=opts_d)}
+    {field("f-neighborhood", "Mahalle / köy", attrs='maxlength="80" placeholder="ör. Kırkpınar"')}
+  </div>
+  {field("f-address", "Açık adres", attrs='maxlength="300" placeholder="Sokak, numara"', wide=True)}
+  <div class="map-prev"><iframe id="map-frame" title="Harita önizlemesi" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden></iframe><p id="map-empty">Adresi yazdığınızda harita burada görünür.</p></div>
+  <p class="hint">Harita yanlış yeri gösteriyorsa adrese mahalle ya da köy adını ekleyin. <a id="map-link" href="https://www.google.com/maps" target="_blank" rel="noopener">Google Haritalar'da aç</a></p>
+</section>
+
+<section class="fsec">
+  <h2><span>6</span> Kurallar</h2>
+  <div class="grid3">
+    {field("f-checkin", "Giriş saati", "time")}
+    {field("f-checkout", "Çıkış saati", "time")}
+  </div>
+  {field("f-rules", "Tesis kuralları", "textarea", hint="Her kuralı ayrı satıra yazın.", attrs='rows="6" maxlength="2000" data-max="2000" placeholder="- Sessiz saatler 23:00 – 08:00&#10;- İçeride sigara içilmez"', wide=True)}
+  {ai_bar("f-rules", "rules", "Kuralları yaz")}
+</section>
+
+<section class="fsec">
+  <h2><span>7</span> İletişim</h2>
+  <p class="hint">Misafirler size bu bilgilerle doğrudan ulaşır. Telefon ya da WhatsApp numarasından en az biri gerekli.</p>
+  <div class="grid2">
+    {field("f-phone", "Telefon", "tel", attrs='maxlength="20" placeholder="05xx xxx xx xx"')}
+    {field("f-whatsapp", "WhatsApp numarası", "tel", attrs='maxlength="20" placeholder="05xx xxx xx xx"')}
+    {field("f-website", "Web siteniz", "url", attrs='maxlength="200" placeholder="www.ornek.com"')}
+    {field("f-booking-url", "Rezervasyon / takvim sayfanız", "url", attrs='maxlength="300" placeholder="Varsa"')}
+    {field("f-instagram", "Instagram kullanıcı adı", attrs='maxlength="60" placeholder="@kullaniciadi"')}
+  </div>
+</section>
+
+<label class="chk-line"><input type="checkbox" id="f-onay"><span>Bilgilerin doğru olduğunu, fotoğrafların bana ait olduğunu ya da kullanma hakkım bulunduğunu onaylıyorum.</span></label>
+<div id="form-msg" class="msg" role="status" hidden></div>
+<div class="form-actions sticky-actions">
+  <button type="submit" id="kaydet" class="btn solid">Kaydet ve yayınla</button>
+  <button type="submit" id="taslak" class="btn line">Taslak olarak kaydet</button>
+  <a id="goruntule" class="btn line" target="_blank" hidden>Sayfayı görüntüle</a>
+  <button type="button" id="sil" class="btn danger-line" hidden>Tesisi sil</button>
+</div>
+<div id="sil-onay" class="note warm" hidden><p>Tesis sayfası ve fotoğrafları kalıcı olarak silinecek. Emin misiniz?</p>
+  <div class="actions"><button type="button" id="sil-evet" class="btn danger">Evet, sil</button><button type="button" id="sil-hayir" class="btn line">Vazgeç</button></div></div>
+</form>
+</div>
+"""
+    write("/tesis-ekle/", page("/tesis-ekle/", "Tesisinizi Ekleyin – Bungalov Dünyası",
+                               "Bungalov tesisinizi Bungalov Dünyası'na ücretsiz ekleyin: fotoğraflar, olanaklar, konum ve doğrudan iletişim.",
+                               body, scripts=["tesis-form"], noindex=True))
+
+
+def build_listing_shell():
+    body = """
+<div class="wrap">
+<p id="tesis-yukleniyor" class="loading" style="padding:60px 0">Yükleniyor…</p>
+<div id="tesis-msg" class="msg" role="status" hidden></div>
+<div id="tesis" hidden></div>
+</div>
+"""
+    write("/tesis/", page("/tesis/", "Tesis – Bungalov Dünyası", "Sapanca bungalov tesisi: fotoğraflar, olanaklar ve doğrudan iletişim.",
+                          body, scripts=["tesis"], noindex=True, active="/tesisler/"))
+
+
+def build_legal():
+    contact = f'<a href="{wa("Merhaba, kişisel verilerimle ilgili başvuru yapmak istiyorum.")}" rel="noopener">WhatsApp</a> ya da <a href="tel:+{WA}">0532 722 25 45</a>'
+    kvkk = f"""
+<div class="wrap">{crumbs([(None, "Kişisel verilerin korunması")])}
+<header class="page-head"><h1>Kişisel verilerin korunması aydınlatma metni</h1><p>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında, üyelerimizin ve ziyaretçilerimizin kişisel verilerini nasıl işlediğimizi açıklıyoruz.</p></header>
+<div class="prose">
+  <h2>Veri sorumlusu</h2>
+  <p>Bungalov Dünyası (bungalovdunyasi.tr), Sapanca / Sakarya. İletişim: {contact}.</p>
+  <h2>Hangi verileri işliyoruz?</h2>
+  <ul>
+    <li><strong>Üyelik bilgileri:</strong> ad soyad, e-posta adresi, telefon numarası (kurumsal üyelerde), tesis adları, üyelik türü, şifrenizin geri döndürülemez özeti.</li>
+    <li><strong>Google ile girişte:</strong> Google hesabınızın adı ve e-posta adresi.</li>
+    <li><strong>Tesis bilgileri:</strong> kurumsal üyelerin eklediği tesis adı, adresi, iletişim bilgileri, açıklamaları ve fotoğrafları. Bu bilgiler tesis sayfasında herkese açık yayımlanır.</li>
+    <li><strong>Favoriler:</strong> kişisel üyelerin kaydettiği tesisler.</li>
+    <li><strong>Teknik bilgiler:</strong> oturumun açık kalması için tarayıcınızda tutulan oturum anahtarı. Ziyaret istatistiklerini çerez kullanmayan Cloudflare Web Analytics ile, kişiyi tanımlamadan tutarız.</li>
+  </ul>
+  <h2>Hangi amaçla?</h2>
+  <ul>
+    <li>Üyelik hesabınızı oluşturmak ve giriş yapmanızı sağlamak,</li>
+    <li>Kurumsal üyelerin tesis sayfalarını yayımlamak ve misafirlerin tesisle doğrudan iletişim kurmasını sağlamak,</li>
+    <li>Favorilerinizi saklamak,</li>
+    <li>Hesabınızla ilgili zorunlu bildirimleri (e-posta doğrulama, şifre yenileme) göndermek,</li>
+    <li>Kötüye kullanımı önlemek ve hukuki yükümlülüklerimizi yerine getirmek.</li>
+  </ul>
+  <h2>Hukuki sebep</h2>
+  <p>Verileriniz, üyelik sözleşmesinin kurulması ve ifası (KVKK m. 5/2-c), hukuki yükümlülüklerimiz (m. 5/2-ç), tesis sayfalarında sizin tarafınızdan alenileştirilmesi (m. 5/2-d) ve meşru menfaatimiz (m. 5/2-f) hukuki sebeplerine dayanılarak işlenir.</p>
+  <h2>Kimlere ve nereye aktarılır?</h2>
+  <p>Verileriniz satılmaz ve reklam amacıyla paylaşılmaz. Hizmeti sunabilmek için aşağıdaki hizmet sağlayıcılardan yararlanırız; bu sağlayıcıların sunucuları yurt dışında bulunabilir:</p>
+  <ul>
+    <li><strong>Supabase</strong> (veritabanı, üyelik ve fotoğraf depolama),</li>
+    <li><strong>GitHub Pages</strong> ve <strong>Cloudflare</strong> (sitenin yayımlanması ve ziyaret istatistikleri),</li>
+    <li><strong>Google</strong> (yalnızca Google ile giriş yaptığınızda),</li>
+    <li><strong>Anthropic</strong> (yalnızca kurumsal üyeler yapay zekâ yardımcısını kullandığında, formdaki tesis bilgileri metin yazmak için gönderilir; üyelik bilgileriniz gönderilmez).</li>
+  </ul>
+  <p>Yurt dışına aktarım, KVKK m. 9'da öngörülen şartlara uygun olarak yapılır.</p>
+  <h2>Ne kadar süre saklanır?</h2>
+  <p>Üyelik bilgileriniz hesabınız açık kaldığı sürece saklanır. Hesabınızı sildiğinizde üyelik bilgileriniz, tesis sayfalarınız, fotoğraflarınız ve favorileriniz silinir; yasal saklama yükümlülüğü olan kayıtlar bu süre boyunca tutulur.</p>
+  <h2>Haklarınız</h2>
+  <p>KVKK m. 11 uyarınca kişisel verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini ya da silinmesini isteme, aktarıldığı kişileri bilme, itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz. Başvurularınızı {contact} üzerinden iletebilirsiniz; en geç 30 gün içinde yanıtlarız.</p>
+  <p class="disclose">Son güncelleme: 14 Ekim 2026</p>
+</div>
+</div>
+"""
+    write("/kvkk/", page("/kvkk/", "KVKK Aydınlatma Metni – Bungalov Dünyası", "Bungalov Dünyası kişisel verilerin korunması aydınlatma metni.", kvkk))
+    terms = f"""
+<div class="wrap">{crumbs([(None, "Üyelik koşulları")])}
+<header class="page-head"><h1>Üyelik koşulları</h1><p>Bungalov Dünyası'na üye olarak aşağıdaki koşulları kabul etmiş olursunuz.</p></header>
+<div class="prose">
+  <h2>Hizmet</h2>
+  <p>Bungalov Dünyası, Sapanca ve çevresindeki bungalov tesislerini tanıtan ücretsiz bir rehberdir. Rezervasyon ve ödeme misafir ile tesis arasında doğrudan yapılır; Bungalov Dünyası bu işlemlerin tarafı değildir ve komisyon almaz.</p>
+  <h2>Üyelik türleri</h2>
+  <ul>
+    <li><strong>Kurumsal üyelik</strong>, bungalov tesisi işleten ya da tesis adına yetkili kişiler içindir. Kurumsal üyeler tesis sayfası oluşturabilir ve düzenleyebilir.</li>
+    <li><strong>Kişisel üyelik</strong>, tatil için tesis arayanlar içindir. Kişisel üyeler tesisleri favorilerine kaydedebilir.</li>
+  </ul>
+  <h2>Kurumsal üyelerin sorumlulukları</h2>
+  <ul>
+    <li>Yalnızca işlettiğiniz ya da yetkili olduğunuz tesisleri ekleyebilirsiniz.</li>
+    <li>Tesis bilgileri doğru ve güncel olmalıdır. Olanaklar gerçeği yansıtmalıdır; örneğin "ısıtmalı havuz" yazıyorsa havuz gerçekten ısıtılıyor olmalıdır.</li>
+    <li>Fotoğraflar tesisin kendisine ait olmalı; başkasına ait ya da telif hakkı size ait olmayan görseller kullanılmamalıdır.</li>
+    <li>Sayfalarda fiyat garantisi, yanıltıcı kampanya, hakaret, kişisel veri ya da yasa dışı içerik yer alamaz.</li>
+    <li>Tesis sayfasındaki içerikten ve misafirlerle yaptığınız anlaşmalardan siz sorumlusunuz.</li>
+  </ul>
+  <h2>Yayından kaldırma</h2>
+  <p>Bu koşullara aykırı, yanıltıcı ya da misafirlerden ciddi şikâyet alan sayfaları önceden haber vermeksizin yayından kaldırabilir, gerekirse üyeliği sonlandırabiliriz.</p>
+  <h2>Yapay zekâ yardımcısı</h2>
+  <p>Kurumsal üyelerin kullanabildiği yazım yardımcısı, girdiğiniz bilgilerden taslak metin üretir. Yayımlamadan önce metni kontrol etmek ve doğruluğundan emin olmak sizin sorumluluğunuzdadır. Yardımcının günlük kullanım sınırı vardır.</p>
+  <h2>Hesabın kapatılması</h2>
+  <p>Hesabınızı istediğiniz zaman kapatabilirsiniz. Bunun için {contact} üzerinden bize yazmanız yeterli.</p>
+  <h2>Değişiklikler</h2>
+  <p>Bu koşulları güncelleyebiliriz. Önemli değişiklikleri sitede duyururuz.</p>
+  <p class="disclose">Son güncelleme: 14 Ekim 2026. Kişisel verilerinizin nasıl işlendiği için <a href="/kvkk/">aydınlatma metnine</a> bakın.</p>
+</div>
+</div>
+"""
+    write("/uyelik-kosullari/", page("/uyelik-kosullari/", "Üyelik Koşulları – Bungalov Dünyası", "Bungalov Dünyası kurumsal ve kişisel üyelik koşulları.", terms))
 
 
 # ---------------------------------------------------------------- Uygulama tanıtımı
@@ -480,7 +1029,7 @@ APP_EXTRAS = [
 ]
 
 APP_FAQ = [
-    ("Uygulama gerçekten ücretsiz mi?", "Evet. Bungalov Dünyası rehberine katılan tesisler uygulamayı ücretsiz kullanır. Kurulum ya da aylık ücret yok."),
+    ("Uygulama gerçekten ücretsiz mi?", "Evet. Bungalov Dünyası'na kurumsal üye olan tesisler uygulamayı ücretsiz kullanır. Kurulum ya da aylık ücret yok."),
     ("Verilerim kimde duruyor?", "Rezervasyonlarınız ve misafir bilgileriniz tesisinize ait bulut hesabında durur. Başka bir tesis sizin verinizi göremez. Uygulama her gün yedek de alır."),
     ("Bilgisayar kullanmayı pek bilmiyorum, zorlanır mıyım?", "Uygulama bilgisayara alışık olmayanlar düşünülerek sade tasarlandı. İlk açılışta kısa bir tur adım adım gösterir; kurulumu da sizinle birlikte yaparız."),
     ("Airbnb ve Booking'deki rezervasyonlarım ne olacak?", "Ayarlar'a ilanınızın takvim bağlantısını eklersiniz; o ilanlardaki rezervasyonlar 30 dakikada bir uygulamaya gelir. Elle rezervasyon girdiğinizde Airbnb'de tarihi kapatmanız için hatırlatma çıkar."),
@@ -510,7 +1059,7 @@ def build_app():
       <p class="kicker">Bungalov işletmecileri için ücretsiz uygulama</p>
       <h1>Defter, Excel ve WhatsApp arasında koşturmaya son.</h1>
       <p class="lead">Bungalov Yönetim; rezervasyonu, kaporayı, misafir mesajlarını ve ayın hesabını tek yerde tutar. Sapanca'da beş bungalovluk bir işletme, kendi ihtiyacı için geliştirdi ve her gün kullanıyor.</p>
-      <div class="actions"><a class="btn ember" href="{msg}" rel="noopener">Ücretsiz kullanmak istiyorum</a><a class="btn ghost-light" href="#ozellikler">Neler yapıyor?</a></div>
+      <div class="actions"><a class="btn ember" href="/uye/?tur=kurumsal">Ücretsiz üye olun</a><a class="btn ghost-light" href="#ozellikler">Neler yapıyor?</a></div>
     </div>
     <figure class="screen hero-screen">{shot("takvim", "Bungalov Yönetim takvim ekranı: beş bungalovun iki haftalık doluluk panosu (örnek veriler)", True)}</figure>
   </div>
@@ -544,8 +1093,8 @@ def build_app():
 </div></section>
 
 <section class="band"><div class="wrap">
-  <div><h2>Tesisinizde deneyelim</h2><p>Tesisinizin adını ve bungalov sayısını yazın. Kurulumu birlikte yapalım, ilk rezervasyonları beraber girelim.</p></div>
-  <div class="actions"><a class="btn ember" href="{msg}" rel="noopener">WhatsApp'tan yazın</a><a class="btn ghost-light" href="/tesis-ekle/">Rehbere katılım</a></div>
+  <div><h2>Tesisinizde deneyelim</h2><p>Kurumsal üye olun, tesisinizi rehbere ekleyin. Uygulamanın kurulumunu birlikte yapalım, ilk rezervasyonları beraber girelim.</p></div>
+  <div class="actions"><a class="btn ember" href="/uye/?tur=kurumsal">Ücretsiz üye olun</a><a class="btn ghost-light" href="{msg}" rel="noopener">WhatsApp'tan sorun</a></div>
 </div></section>
 """
     schema = [{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Bungalov Yönetim",
@@ -593,15 +1142,14 @@ def build_404():
 <p>Aradığınız sayfa taşınmış ya da silinmiş olabilir. <a href="/">Ana sayfaya</a> dönebilir ya da <a href="/rehber/">rehbere</a> göz atabilirsiniz.</p>
 </header></div>
 """
-    html_ = page("/404.html", "Sayfa bulunamadı – Bungalov Dünyası", "Aradığınız sayfa bulunamadı.", body)
-    html_ = html_.replace('<link rel="canonical" href="https://bungalovdunyasi.com/404.html">', '<meta name="robots" content="noindex">')
-    write("/404.html", html_)
+    write("/404.html", page("/404.html", "Sayfa bulunamadı – Bungalov Dünyası", "Aradığınız sayfa bulunamadı.", body, noindex=True))
 
 
 def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
-    urls = [("/", newest), ("/tesisler/", "2026-10-13"), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
-        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [("/tesis-ekle/", "2026-10-13"), ("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13")]
+    urls = [("/", newest), ("/tesisler/", max([str(l.get("updated_at") or "")[:10] for l in LISTINGS] + ["2026-10-13"])), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
+        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
+        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14")]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
@@ -612,12 +1160,17 @@ def build_meta():
     write("/favicon.svg", fav)
     shutil.copy(os.path.join(os.path.dirname(OUT), "src", "style.css"), os.path.join(OUT, "style.css"))
     shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "img"), os.path.join(OUT, "img"))
+    shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "js"), os.path.join(OUT, "js"))
 
 
 if __name__ == "__main__":
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
-    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404(); build_meta()
+    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404()
+    build_member(); build_account(); build_listing_shell(); build_legal()
+    for _l in LISTINGS:
+        build_listing(_l)
+    build_meta()
     n = sum(len(fs) for _, _, fs in os.walk(OUT))
     print(f"{n} dosya → {OUT}")

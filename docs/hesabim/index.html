@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hesabım – Bungalov Dünyası</title>
+<meta name="description" content="Bungalov Dünyası üyelik hesabınız.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://bungalovdunyasi.tr/hesabim/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bungalov Dünyası">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:title" content="Hesabım – Bungalov Dünyası">
+<meta property="og:description" content="Bungalov Dünyası üyelik hesabınız.">
+<meta property="og:url" content="https://bungalovdunyasi.tr/hesabim/">
+<meta property="og:image" content="https://images.unsplash.com/photo-1576874748772-584aa2bee2d4?auto=format&fit=crop&w=1200&h=630&q=72">
+<meta name="theme-color" content="#15302b">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css?v=4">
+<link rel="preconnect" href="https://images.unsplash.com">
+</head>
+<body>
+<a class="skip" href="#icerik">İçeriğe geç</a>
+<header class="top"><div class="wrap">
+  <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
+  <nav class="nav" aria-label="Ana menü"><a href="/tesisler/">Tesisler</a><a href="/rehber/">Rehber</a><a href="/uygulama/">İşletmeciler için</a><a href="/hakkimizda/">Hakkımızda</a><a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
+</div></header>
+<main id="icerik">
+
+<div class="wrap"><nav class="crumbs" aria-label="Konum"><a href="/">Ana sayfa</a> / Hesabım</nav>
+<p id="hesap-yukleniyor" class="loading">Yükleniyor…</p>
+<div id="hesap" hidden>
+<header class="page-head"><h1>Hesabım</h1><p><span id="h-email"></span> · <span id="h-tur"></span></p></header>
+<div id="hesap-msg" class="msg" role="status" hidden></div>
+<div class="layout">
+<div class="acct-main">
+  <section id="kurumsal-bolum" hidden>
+    <div class="head"><h2>Tesislerim</h2><a class="btn solid" href="/tesis-ekle/">+ Yeni tesis ekle</a></div>
+    <div id="tesislerim" class="my-list"><p class="loading">Yükleniyor…</p></div>
+    <div class="note"><p><strong>Bungalov Yönetim uygulaması size ücretsiz.</strong> Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları ve ayın hesabı tek yerde. <a href="/uygulama/">Uygulamayı inceleyin</a> ya da kurulum için <a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20kurumsal%20%C3%BCyesiyim.%20Bungalov%20Y%C3%B6netim%20uygulamas%C4%B1n%C4%B1%20kurmak%20istiyorum." rel="noopener">bize yazın</a>, birlikte kuralım.</p></div>
+  </section>
+  <section id="kisisel-bolum" hidden>
+    <div class="head"><h2>Favorilerim</h2></div>
+    <div id="favorilerim" class="my-list"><p class="loading">Yükleniyor…</p></div>
+    <div class="note"><p>Bungalov tesisiniz mi var? <button type="button" id="kurumsala-gec" class="linkish">Kurumsal üyeliğe geçin</button>, tesisinizi ücretsiz ekleyin.</p></div>
+  </section>
+</div>
+<aside class="aside">
+  <h3>Bilgilerim</h3>
+  <form id="f-profil">
+    <label class="fld" for="h-ad"><span>Ad soyad</span><input id="h-ad" type="text" maxlength="80" autocomplete="name"></label>
+    <label class="fld" for="h-tel"><span>Telefon</span><input id="h-tel" type="tel" maxlength="20" autocomplete="tel"></label>
+    <div id="h-firma-satir"><label class="fld" for="h-firma"><span>Tesis adları</span><input id="h-firma" type="text" maxlength="200"></label></div>
+    <button class="btn solid" type="submit">Kaydet</button>
+  </form>
+  <button type="button" id="cikis" class="btn line">Çıkış yap</button>
+  <p class="hint" style="margin-top:14px">Hesabınızı silmek için <a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20hesab%C4%B1m%C4%B1%20silmek%20istiyorum.%20E-posta%20adresim%3A%20" rel="noopener">bize yazın</a>.</p>
+</aside>
+</div>
+</div>
+</div>
+
+</main>
+<footer class="foot"><div class="wrap">
+  <div>
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
+    <p>Sapanca ve çevresinde bungalov arayanlar için sade bir rehber. Rezervasyonu doğrudan tesisle yaparsınız; araya komisyon girmez.</p>
+  </div>
+  <div>
+    <h4>Sayfalar</h4>
+    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li></ul>
+  </div>
+  <div>
+    <h4>İletişim</h4>
+    <ul><li><a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20hakk%C4%B1nda%20yaz%C4%B1yorum." rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+905327222545">0532 722 25 45</a></li><li><a href="/kvkk/">Kişisel veriler (KVKK)</a></li><li><a href="/uyelik-kosullari/">Üyelik koşulları</a></li></ul>
+  </div>
+  <p class="small">© 2026 Bungalov Dünyası. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
+</div></footer>
+<script>try{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}catch(e){}</script>
+<script src="/js/vendor/supabase-2.117.0.js"></script>
+<script src="/js/core.js?v=4"></script>
+<script src="/js/hesabim.js?v=4"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e4d1630b9947485b835f8b18c6dd0d75"}'></script>
+</body>
+</html>

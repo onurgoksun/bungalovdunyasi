@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=3">
+<link rel="stylesheet" href="/style.css?v=4">
 <link rel="preconnect" href="https://images.unsplash.com">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Bungalov Dünyası", "url": "https://bungalovdunyasi.tr/", "inLanguage": "tr"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Bungalov Dünyası", "url": "https://bungalovdunyasi.tr/", "logo": "https://bungalovdunyasi.tr/favicon.svg", "contactPoint": {"@type": "ContactPoint", "telephone": "+905327222545", "contactType": "customer support", "areaServed": "TR", "availableLanguage": "Turkish"}}</script>
@@ -27,7 +27,7 @@
 <a class="skip" href="#icerik">İçeriğe geç</a>
 <header class="top"><div class="wrap">
   <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 28 16 4l13 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M9.5 28 16 16l6.5 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="21" width="4" height="4.5" rx=".6" fill="#e39a3b"/></svg>Bungalov Dünyası</a>
-  <nav class="nav" aria-label="Ana menü"><a href="/tesisler/">Tesisler</a><a href="/rehber/">Rehber</a><a href="/uygulama/">İşletmeciler için</a><a href="/hakkimizda/">Hakkımızda</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
+  <nav class="nav" aria-label="Ana menü"><a href="/tesisler/">Tesisler</a><a href="/rehber/">Rehber</a><a href="/uygulama/">İşletmeciler için</a><a href="/hakkimizda/">Hakkımızda</a><a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
 </div></header>
 <main id="icerik">
 
@@ -45,7 +45,7 @@
 
 <section class="block"><div class="wrap">
   <div class="head"><h2>Tesisler</h2><p>Her tesisi tek tek tanıyoruz. Listeye yalnızca gerçek fotoğrafı ve net bilgisi olan bungalovlar giriyor.</p></div>
-  <article class="fac">
+  <article class="fac" data-slug="labella-bungalov">
   <a class="shots" href="/tesisler/labella-bungalov/" tabindex="-1" aria-hidden="true"><img src="https://labellabungalov.com/wp-content/uploads/2026/09/labella-bungalov-sapanca-6-819x1024.webp" alt="A-frame bungalov ve özel havuz, havadan — Labella Bungalov" loading="lazy" width="733" height="1024"><img src="https://labellabungalov.com/wp-content/uploads/2026/09/labella-bungalov-sapanca-38-733x1024.webp" alt="Gece aydınlatmalı A-frame bungalov ve havuz — Labella Bungalov" loading="lazy" width="733" height="1024"><img src="https://labellabungalov.com/wp-content/uploads/2026/09/labella-bungalov-sapanca-27-733x1024.webp" alt="Bungalov iç mekânı, oturma alanı — Labella Bungalov" loading="lazy" width="733" height="1024"></a>
   <div>
     <h3><a href="/tesisler/labella-bungalov/">Labella Bungalov</a></h3>
@@ -55,6 +55,8 @@
     <div class="actions"><a class="btn solid" href="/tesisler/labella-bungalov/">Bungalovu incele</a><a class="btn line" href="https://labellabungalov.com/rezervasyon/?utm_source=bungalovdunyasi&utm_medium=referral" rel="noopener">Müsaitlik ve fiyat</a></div>
   </div>
 </article>
+  
+  
   <div class="slot">
   <p><strong>Sapanca'da bungalov işletiyor musunuz?</strong>Tesisinizi ücretsiz ekleyin. Misafirler size doğrudan ulaşır, komisyon ödemezsiniz.</p>
   <a class="btn solid" href="/tesis-ekle/">Tesisinizi ekleyin</a>
@@ -73,11 +75,12 @@
   </div>
   <div>
     <ul>
-      <li>Fotoğraflı, ayrıntılı tesis sayfası</li>
+      <li>Ücretsiz üye olun, tesisinizi kendiniz ekleyin; sayfanız hemen yayında</li>
+      <li>Tanıtım yazısı için yapay zekâ yardımcısı</li>
       <li>Ücretsiz Bungalov Yönetim uygulaması: takvim, rezervasyon ve misafir mesajları tek yerde</li>
       <li>Kendi web sitenize ekleyebileceğiniz rezervasyon sayfası</li>
     </ul>
-    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Nasıl eklenir?</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
+    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Tesisinizi ekleyin</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
   </div>
 </div></section>
 
@@ -89,14 +92,15 @@
   </div>
   <div>
     <h4>Sayfalar</h4>
-    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li></ul>
+    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li></ul>
   </div>
   <div>
     <h4>İletişim</h4>
-    <ul><li><a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20hakk%C4%B1nda%20yaz%C4%B1yorum." rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+905327222545">0532 722 25 45</a></li></ul>
+    <ul><li><a href="https://wa.me/905327222545?text=Merhaba%2C%20Bungalov%20D%C3%BCnyas%C4%B1%20hakk%C4%B1nda%20yaz%C4%B1yorum." rel="noopener">WhatsApp ile yazın</a></li><li><a href="tel:+905327222545">0532 722 25 45</a></li><li><a href="/kvkk/">Kişisel veriler (KVKK)</a></li><li><a href="/uyelik-kosullari/">Üyelik koşulları</a></li></ul>
   </div>
   <p class="small">© 2026 Bungalov Dünyası. Tesis bilgileri tesislerin kendi beyanına dayanır; fiyat ve müsaitlik için tesisle görüşün.</p>
 </div></footer>
+<script>try{if(localStorage.getItem("sb-sbqjblbiwivytybtlxdi-auth-token")){var a=document.getElementById("acct-link");a.textContent="Hesabım";a.href="/hesabim/"}}catch(e){}</script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "e4d1630b9947485b835f8b18c6dd0d75"}'></script>
 </body>
 </html>
