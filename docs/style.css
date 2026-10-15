@@ -369,3 +369,16 @@ p.hint { margin: 0 0 14px; }
 .regions a small { font: 500 13.5px/1.2 var(--head); color: var(--stone); }
 .regions a:hover, .regions a[aria-current="page"] { border-color: var(--ink); background: var(--mist); }
 .regions a.add { justify-content: center; border-style: dashed; color: var(--pine); font-size: 16px; }
+
+/* Partner rozeti */
+.badge-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin: 4px 0 40px; }
+.badge-row img { height: auto; max-width: 100%; }
+.partner-list { list-style: none; padding: 0 !important; }
+.partner-list li { padding: 10px 0; border-bottom: 1px solid var(--line); margin: 0 !important; }
+.partner-list .place { color: var(--stone); font-size: 15px; margin-left: 8px; }
+pre.code { white-space: pre-wrap; word-break: break-all; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; font: 13.5px/1.5 ui-monospace, Consolas, monospace; color: var(--ink); }
+.badge-box { margin-top: 10px; padding: 14px; background: var(--mist); border-radius: 10px; grid-column: 1 / -1; }
+.badge-box textarea { width: 100%; font: 13px/1.5 ui-monospace, Consolas, monospace; border: 1px solid #b9c8c1; border-radius: 8px; padding: 10px; resize: vertical; }
+.badge-box .actions { margin-top: 8px; }
+.badge-box img { width: auto !important; height: 44px !important; object-fit: contain !important; background: none !important; border-radius: 0 !important; }
+.badge-box .mini { padding: 4px; }

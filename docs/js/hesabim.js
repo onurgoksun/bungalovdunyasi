@@ -59,6 +59,7 @@
         ]),
         el("div", { class: "my-actions" }, [
           l.status === "yayinda" ? el("a", { class: "btn line sm", href: "/tesis/?t=" + encodeURIComponent(l.slug), text: "Görüntüle" }) : null,
+          l.status === "yayinda" ? el("button", { class: "btn line sm", type: "button", text: "Rozet", onclick: function () { toggleBadge(row, l); } }) : null,
           el("a", { class: "btn solid sm", href: "/tesis-ekle/?id=" + encodeURIComponent(l.id), text: "Düzenle" }),
           l.status !== "kaldirildi" ? el("button", { class: "btn line sm", type: "button", text: l.status === "yayinda" ? "Taslağa al" : "Yayınla",
             onclick: async function () {
@@ -71,6 +72,31 @@
       ]);
       box.appendChild(row);
     });
+  }
+
+  // Partner rozeti: tesisin sitesine eklenecek kod
+  function toggleBadge(row, l) {
+    var old = row.querySelector(".badge-box");
+    if (old) { old.remove(); return; }
+    var target = "https://bungalovdunyasi.com/tesisler/" + l.slug + "/";
+    var styles = [["muhur", "Mühür", 120, 120], ["partner", "Koyu", 220, 61], ["partner-acik", "Açık", 220, 61]];
+    var ta = el("textarea", { rows: "3", readonly: true });
+    var prev = el("div", { class: "badge-row", style: "margin:10px 0" });
+    function set(st) {
+      ta.value = '<a href="' + target + '" target="_blank" rel="noopener" title="Bungalov Dünyası partner tesis"><img src="https://bungalovdunyasi.com/rozet/' + st[0] + '.svg" alt="Bungalov Dünyası Partner Tesis" width="' + st[2] + '" height="' + st[3] + '"></a>';
+    }
+    styles.forEach(function (st) {
+      prev.appendChild(el("button", { type: "button", class: "mini", title: st[1], onclick: function () { set(st); } }, [el("img", { src: "/rozet/" + st[0] + ".svg", alt: st[1], style: "height:44px;width:auto" })]));
+    });
+    set(styles[0]);
+    var copy = el("button", { type: "button", class: "btn solid sm", text: "Kodu kopyala", onclick: function () {
+      ta.select(); try { navigator.clipboard.writeText(ta.value); } catch (e) { document.execCommand("copy"); }
+      copy.textContent = "Kopyalandı";
+    } });
+    row.appendChild(el("div", { class: "badge-box" }, [
+      el("p", { class: "small", style: "margin:0", text: "Rozeti sitenizin alt kısmına ya da iletişim sayfasına ekleyin. Tıklayan misafir tesisinizin Bungalov Dünyası sayfasına gelir. Bir görünüm seçin, kodu kopyalayıp sitenize yapıştırın (WordPress'te \"Özel HTML\" bloğuna)." }),
+      prev, ta, el("div", { class: "actions" }, [copy, el("a", { class: "btn line sm", href: "/rozet/", target: "_blank", text: "Rozet ne demek?" })])
+    ]));
   }
 
   async function loadFavorites() {

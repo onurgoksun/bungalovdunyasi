@@ -136,7 +136,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
   </div>
   <div>
     <h4>Sayfalar</h4>
-    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li></ul>
+    <ul><li><a href="/tesisler/">Tesisler</a></li><li><a href="/rehber/">Rehber</a></li><li><a href="/hakkimizda/">Hakkımızda</a></li><li><a href="/tesis-ekle/">Tesisinizi ekleyin</a></li><li><a href="/uye/">Üye girişi</a></li><li><a href="/rozet/">Partner rozeti</a></li></ul>
   </div>
   <div>
     <h4>İletişim</h4>
@@ -1065,6 +1065,57 @@ def build_listing_shell():
                           body, scripts=["tesis"], noindex=True, active="/tesisler/"))
 
 
+def badge_code(target, style="muhur"):
+    w, h = (120, 120) if style == "muhur" else (220, 61)
+    return (f'<a href="{target}" target="_blank" rel="noopener" title="Bungalov Dünyası partner tesis">'
+            f'<img src="{SITE}/rozet/{style}.svg" alt="Bungalov Dünyası Partner Tesis" width="{w}" height="{h}"></a>')
+
+
+def build_badge():
+    partners = [(f'/tesisler/{LABELLA["slug"]}/', LABELLA["name"], LABELLA["area"])] + \
+        [(f'/tesisler/{l["slug"]}/', l["name"], place_of(l)) for l in LISTINGS]
+    plist = "".join(f'<li><a href="{u}">{esc(n)}</a> <span class="place">{esc(p)}</span></li>' for u, n, p in partners)
+    sample = esc(badge_code(SITE + "/tesisler/tesisinizin-adi/"))
+    body = f"""
+<div class="wrap">{crumbs([(None, "Partner rozeti")])}
+<header class="page-head"><h1>Bungalov Dünyası partner rozeti</h1>
+<p>Bu rozeti bir tesisin web sitesinde ya da Instagram'ında görüyorsanız, o tesis Bungalov Dünyası'nın partneridir ve aşağıdaki ölçütlere uymayı kabul etmiştir.</p></header>
+<div class="badge-row">
+  <img src="/rozet/muhur.svg" alt="Bungalov Dünyası Partner Tesis mührü" width="150" height="150">
+  <img src="/rozet/partner.svg" alt="Bungalov Dünyası Partner Tesis rozeti (koyu)" width="260" height="72">
+  <img src="/rozet/partner-acik.svg" alt="Bungalov Dünyası Partner Tesis rozeti (açık)" width="260" height="72">
+</div>
+<div class="layout">
+<div class="prose">
+  <h2>Partner tesisin ölçütleri</h2>
+  <ul class="checklist">
+    <li><strong>Gerçek ve güncel fotoğraf.</strong> Tesis sayfasındaki fotoğraflar tesisin kendisine ait; başka yerden alınmış ya da yanıltıcı biçimde düzenlenmiş görsel yok.</li>
+    <li><strong>Doğru olanak bilgisi.</strong> "Özel havuz", "ısıtmalı havuz", "jakuzi", "şömine" yazıyorsa bunlar gerçekten var ve misafirin kullanımına açık.</li>
+    <li><strong>Açık kurallar.</strong> Giriş-çıkış saatleri, evcil hayvan ve diğer kurallar rezervasyondan önce açıkça yazılı.</li>
+    <li><strong>Doğrudan iletişim.</strong> Misafir tesisle aracısız konuşur; rezervasyonda araya komisyon girmez.</li>
+    <li><strong>Şikâyete açık.</strong> Misafirlerden gelen ciddi şikâyetleri inceleriz; ölçütlere uymayan tesisin rozeti ve sayfası kaldırılır.</li>
+  </ul>
+  <p>Rozete tıklayan misafir, tesisin Bungalov Dünyası'ndaki sayfasına gelir. Böylece rozetin gerçek olduğunu kendisi görebilir.</p>
+  <h2>Partner tesisler</h2>
+  <ul class="partner-list">{plist}</ul>
+  <h2>Tesisinize rozet ekleyin</h2>
+  <p>Rozet, Bungalov Dünyası'na kurumsal üye olan ve tesis sayfası yayında olan her tesise ücretsizdir. <a href="/hesabim/">Hesabım</a> sayfasında tesisinizin yanındaki <strong>Rozet</strong> düğmesine basın; sitenize ekleyeceğiniz kod hazır gelir. Kod şuna benzer:</p>
+  <pre class="code">{sample}</pre>
+  <p class="disclose">Açıklık notu: Bungalov Dünyası'nı hazırlayan ekip Labella Bungalov'u da işletiyor. Labella'ya da diğer tesislere uyguladığımız ölçütleri uyguluyoruz.</p>
+</div>
+<aside class="aside" aria-label="Partner olun">
+  <h3>Partner olun</h3>
+  <p>Ücretsiz kurumsal üye olun, tesisinizi ekleyin; rozetiniz hemen hazır.</p>
+  <a class="btn solid" href="/tesis-ekle/">Tesisinizi ekleyin</a>
+</aside>
+</div>
+</div>
+"""
+    write("/rozet/", page("/rozet/", "Partner Tesis Rozeti – Bungalov Dünyası",
+                          "Bungalov Dünyası partner tesis rozeti ne anlama gelir? Gerçek fotoğraf, doğru olanak bilgisi ve komisyonsuz doğrudan rezervasyon ölçütleri.",
+                          body, [crumbs_ld([("/rozet/", "Partner rozeti")])]))
+
+
 def build_legal():
     contact = f'<a href="{wa("Merhaba, kişisel verilerimle ilgili başvuru yapmak istiyorum.")}" rel="noopener">WhatsApp</a> ya da <a href="tel:+{WA}">0532 722 25 45</a>'
     kvkk = f"""
@@ -1296,7 +1347,7 @@ def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
     urls = [("/", newest), ("/tesisler/", max([str(l.get("updated_at") or "")[:10] for l in LISTINGS] + ["2026-10-13"])), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
         [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
-        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14")] + \
+        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14"), ("/rozet/", "2026-10-15")] + \
         [(region_path(*k), max([str(l.get("updated_at") or "")[:10] for l in r["listings"]] + ["2026-10-14"])) for k, r in REGIONS.items()] + \
         [(region_path(il), "2026-10-14") for il in PROVINCES]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -1310,6 +1361,7 @@ def build_meta():
     shutil.copy(os.path.join(os.path.dirname(OUT), "src", "style.css"), os.path.join(OUT, "style.css"))
     shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "img"), os.path.join(OUT, "img"))
     shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "js"), os.path.join(OUT, "js"))
+    shutil.copytree(os.path.join(os.path.dirname(OUT), "src", "rozet"), os.path.join(OUT, "rozet"), dirs_exist_ok=True)
     write("/js/iller.js", "window.BD_ILLER = " + json.dumps(GEO, ensure_ascii=False) + ";\n")
 
 
@@ -1318,7 +1370,7 @@ if __name__ == "__main__":
         shutil.rmtree(OUT)
     os.makedirs(OUT)
     build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404()
-    build_member(); build_account(); build_listing_shell(); build_legal(); build_regions()
+    build_member(); build_account(); build_listing_shell(); build_legal(); build_regions(); build_badge()
     for _l in LISTINGS:
         build_listing(_l)
     build_meta()
