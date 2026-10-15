@@ -101,6 +101,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="V3oeHZfKnUn1ya8pLniYkwP-Qiciuhcla1jOkWZmRug">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 {robots}<link rel="canonical" href="{canonical}">
