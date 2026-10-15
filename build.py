@@ -73,7 +73,16 @@ CSSV = _hash("src/style.css")
 SB_JS = "/js/vendor/supabase-2.117.0.js"
 
 
-def page(path, title, desc, body, schema=None, active=None, og_image=None, scripts=None, noindex=False):
+def fit_title(title, limit=60):
+    # Google ~60 karakterden uzun başlıkları keser; sığmıyorsa site adı ekini at.
+    for suf in (" | " + NAME, " – " + NAME):
+        if len(title) > limit and title.endswith(suf):
+            return title[: -len(suf)]
+    return title
+
+
+def page(path, title, desc, body, schema=None, active=None, og_image=None, scripts=None, noindex=False, og_type="website"):
+    title = fit_title(title)
     canonical = SITE + path
     js = ""
     if scripts:
@@ -95,7 +104,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 {robots}<link rel="canonical" href="{canonical}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{og_type}">
 <meta property="og:site_name" content="{NAME}">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:title" content="{esc(title)}">
@@ -566,7 +575,7 @@ def build_home():
               {"@context": "https://schema.org", "@type": "Organization", "name": NAME, "url": SITE + "/",
                "logo": SITE + "/favicon.svg",
                "contactPoint": {"@type": "ContactPoint", "telephone": "+" + WA, "contactType": "customer support", "areaServed": "TR", "availableLanguage": "Turkish"}}]
-    write("/", page("/", "Bungalov Dünyası | Özel Havuzlu, Jakuzili ve Şömineli Bungalov Rehberi",
+    write("/", page("/", "Bungalov Dünyası: Havuzlu, Jakuzili ve Şömineli Bungalovlar",
                     "Türkiye'de özel havuzlu, jakuzili ve şömineli bungalovlar. Tesisleri ayrıntısıyla tanıyın, rezervasyonu komisyonsuz doğrudan tesisle yapın.",
                     body, schema))
 
@@ -639,7 +648,7 @@ def build_regions():
 </div></section>
 {g_html}
 """
-        write(path, page(path, f"{ilce} Bungalov: Özel Havuzlu, Jakuzili Tesisler ({n}) – Bungalov Dünyası",
+        write(path, page(path, f"{ilce} Bungalov: Özel Havuzlu, Jakuzili Tesisler – Bungalov Dünyası",
                          f"{ilce}, {il} bölgesinde {n} bungalov tesisi: fotoğraflar, olanaklar ve doğrudan iletişim. Rezervasyon komisyonsuz, doğrudan tesisle.",
                          body, [crumbs_ld([("/tesisler/", "Tesisler"), (region_path(il), il), (path, ilce)])], active="/tesisler/"))
     for il, ilceler in PROVINCES.items():
@@ -660,7 +669,7 @@ def build_regions():
   {SLOT}
 </div></section>
 """
-        write(path, page(path, f"{il} Bungalov Tesisleri ({n}) – Bungalov Dünyası",
+        write(path, page(path, f"{il} Bungalov Tesisleri – Bungalov Dünyası",
                          f"{il} ilinde {n} bungalov tesisi: {', '.join(sorted(ilceler))}. Fotoğraflar, olanaklar ve doğrudan iletişim.",
                          body, [crumbs_ld([("/tesisler/", "Tesisler"), (path, il)])], active="/tesisler/"))
 
@@ -725,7 +734,7 @@ def build_labella():
         "checkinTime": "14:00", "checkoutTime": "11:30", "numberOfRooms": 5,
         "amenityFeature": [{"@type": "LocationFeatureSpecification", "name": a, "value": True} for a in amen],
     }
-    write(path, page(path, "Labella Bungalov – Sapanca Özel Havuzlu, Jakuzili A-Frame Bungalov | Bungalov Dünyası",
+    write(path, page(path, "Labella Bungalov Sapanca: Özel Havuzlu, Jakuzili A-Frame",
                      "Sapanca Memnuniye'de 5 bağımsız A-frame bungalov: ısıtmalı özel havuz, sıcak jakuzi, şömine, 4+1 kişilik. Fotoğraflar, olanaklar ve doğrudan iletişim.",
                      body, [lodging, crumbs_ld([("/tesisler/", "Tesisler"), (region_path("Sakarya"), "Sakarya"), (region_path("Sakarya", "Sapanca"), "Sapanca"), (path, f["name"])])], active="/tesisler/",
                      og_image=UP + f["shots"][0][0]))
@@ -739,7 +748,7 @@ def build_guides():
 <div class="prose" style="max-width:none">{guide_list()}</div>
 </div>
 """
-    write("/rehber/", page("/rehber/", "Bungalov Rehberi: Seçim, Kış Tatili, Evcil Hayvan, Sapanca | Bungalov Dünyası",
+    write("/rehber/", page("/rehber/", "Bungalov Rehberi: Sapanca, Kış Tatili, Balayı, Evcil Hayvan",
                            "Bungalov kiralamadan önce bilmeniz gerekenler: sorulacak sorular, kışın ısıtmalı havuz ve jakuzi, evcil hayvanla tatil ve bölge rehberleri.",
                            body, [crumbs_ld([("/rehber/", "Rehber")])], active="/rehber/"))
     for g in GUIDES:
@@ -775,7 +784,7 @@ def build_guides():
         if g["faq"]:
             schema.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
                 {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in g["faq"]]})
-        write(path, page(path, g["seo_title"] + " | Bungalov Dünyası", g["desc"], body, schema, active="/rehber/", og_image=ux(g["img"], 1200, 630)))
+        write(path, page(path, g["seo_title"] + " | Bungalov Dünyası", g["desc"], body, schema, active="/rehber/", og_image=ux(g["img"], 1200, 630), og_type="article"))
 
 
 def field(id_, label, kind="text", hint="", attrs="", wide=False):
@@ -1242,7 +1251,7 @@ def build_app():
               {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
                   {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in APP_FAQ]},
               crumbs_ld([("/uygulama/", "Bungalov Yönetim")])]
-    write("/uygulama/", page("/uygulama/", "Bungalov Yönetim: Bungalov İşletmecileri İçin Ücretsiz Rezervasyon Uygulaması",
+    write("/uygulama/", page("/uygulama/", "Bungalov Yönetim: Ücretsiz Bungalov Rezervasyon Uygulaması",
                              "Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları, bayram fiyatları ve gelir-gider tek uygulamada. Bungalov Dünyası'ndaki tesislere ücretsiz.",
                              body, schema, active="/uygulama/", og_image=SITE + "/img/uygulama/takvim.webp"))
 
