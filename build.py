@@ -3,7 +3,7 @@
 import html, json, os, re, shutil, datetime, urllib.request
 from urllib.parse import quote
 
-SITE = "https://bungalovdunyasi.tr"
+SITE = "https://bungalovdunyasi.com"
 NAME = "Bungalov Dünyası"
 WA = "905327222545"
 TODAY = datetime.date.today().isoformat()
@@ -1062,7 +1062,7 @@ def build_legal():
 <header class="page-head"><h1>Kişisel verilerin korunması aydınlatma metni</h1><p>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında, üyelerimizin ve ziyaretçilerimizin kişisel verilerini nasıl işlediğimizi açıklıyoruz.</p></header>
 <div class="prose">
   <h2>Veri sorumlusu</h2>
-  <p>Bungalov Dünyası (bungalovdunyasi.tr), Sapanca / Sakarya. İletişim: {contact}.</p>
+  <p>Bungalov Dünyası (bungalovdunyasi.com), Sapanca / Sakarya. İletişim: {contact}.</p>
   <h2>Hangi verileri işliyoruz?</h2>
   <ul>
     <li><strong>Üyelik bilgileri:</strong> ad soyad, e-posta adresi, telefon numarası (kurumsal üyelerde), tesis adları, üyelik türü, şifrenizin geri döndürülemez özeti.</li>
@@ -1293,7 +1293,7 @@ def build_meta():
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
     write("/robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
-    write("/CNAME", "bungalovdunyasi.tr\n")
+    write("/CNAME", "bungalovdunyasi.com\n")
     write("/.nojekyll", "")
     fav = LOGO_SVG.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"').replace("currentColor", "#15302b")
     write("/favicon.svg", fav)
