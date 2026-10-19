@@ -8,7 +8,7 @@ Biçim: `- [ ] başlık önerisi | slug | görsel anahtarı | not`
 - [x] Sapanca bungalov fiyatları neden bu kadar farklı? | sapanca-bungalov-fiyatlari-neden-farkli | firepit | Rakam verme ya da yalnızca kaynağı belli genel aralık ver; fiyatı etkileyen etkenleri anlat. | yayın: 2026-10-14
 - [x] Balayı için Sapanca'da bungalov: gizlilik, jakuzi, süsleme, kahvaltı | sapanca-balayi-bungalov | stars | | yayın: 2026-10-14
 - [x] Kalabalık grup için Sapanca'da bungalov (6-10 kişi) | sapanca-kalabalik-grup-bungalov | fireplace | | yayın: 2026-10-15
-- [ ] Sapanca'da jakuzili bungalov: içeride mi, terasta mı, gerçekten sıcak mı? | sapanca-jakuzili-bungalov | stars | Anahtar kelime: sapanca jakuzili bungalov. Jakuzi türlerini, ısıtmayı, kış kullanımını, hijyeni ve tesise sorulacakları anlat. Fiyat verme.
+- [x] Sapanca'da jakuzili bungalov: içeride mi, terasta mı, gerçekten sıcak mı? | sapanca-jakuzili-bungalov | stars | Anahtar kelime: sapanca jakuzili bungalov. Jakuzi türlerini, ısıtmayı, kış kullanımını, hijyeni ve tesise sorulacakları anlat. Fiyat verme. | yayın: 2026-10-19
 - [ ] Sapanca'da havuzlu bungalov: özel mi ortak mı, ısıtmalı mı? | sapanca-havuzlu-bungalov | pool | Anahtar kelime: sapanca havuzlu bungalov. Özel/ortak havuz, ısıtma ve mevsim, kapalı/açık havuz, çocuk güvenliği, tesise sorulacaklar. Fiyat verme.
 - [ ] İstanbul'dan Sapanca'ya ulaşım: araba, hızlı tren, otobüs | istanbuldan-sapancaya-ulasim | lake | Tren seferleri ve duraklar için güncel resmi kaynağı (TCDD) kontrol et; süreleri yaklaşık ver.
 - [ ] Kartepe mi Sapanca mı? Kış kaçamağı karşılaştırması | kartepe-mi-sapanca-mi | snow |
