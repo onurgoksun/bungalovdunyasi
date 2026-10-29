@@ -11,7 +11,7 @@ Biçim: `- [ ] başlık önerisi | slug | görsel anahtarı | not`
 - [x] Sapanca'da jakuzili bungalov: içeride mi, terasta mı, gerçekten sıcak mı? | sapanca-jakuzili-bungalov | stars | Anahtar kelime: sapanca jakuzili bungalov. Jakuzi türlerini, ısıtmayı, kış kullanımını, hijyeni ve tesise sorulacakları anlat. Fiyat verme. | yayın: 2026-10-19
 - [x] Sapanca'da havuzlu bungalov: özel mi ortak mı, ısıtmalı mı? | sapanca-havuzlu-bungalov | pool | Anahtar kelime: sapanca havuzlu bungalov. Özel/ortak havuz, ısıtma ve mevsim, kapalı/açık havuz, çocuk güvenliği, tesise sorulacaklar. Fiyat verme. | yayın: 2026-10-22
 - [x] İstanbul'dan Sapanca'ya ulaşım: araba, hızlı tren, otobüs | istanbuldan-sapancaya-ulasim | lake | Tren seferleri ve duraklar için güncel resmi kaynağı (TCDD) kontrol et; süreleri yaklaşık ver. | yayın: 2026-10-26
-- [ ] Kartepe mi Sapanca mı? Kış kaçamağı karşılaştırması | kartepe-mi-sapanca-mi | snow |
+- [x] Kartepe mi Sapanca mı? Kış kaçamağı karşılaştırması | kartepe-mi-sapanca-mi | snow | | yayın: 2026-10-29
 - [ ] Hafta içi bungalov tatili: neden daha mantıklı? | hafta-ici-bungalov-tatili | inside |
 - [ ] Sapanca'da yağmurlu günde ne yapılır? | sapanca-yagmurlu-gunde-ne-yapilir | fireplace |
 - [ ] Bungalovda doğum günü ve yıl dönümü sürprizi | bungalovda-dogum-gunu-surprizi | stars |
