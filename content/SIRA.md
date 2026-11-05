@@ -13,7 +13,7 @@ Biçim: `- [ ] başlık önerisi | slug | görsel anahtarı | not`
 - [x] İstanbul'dan Sapanca'ya ulaşım: araba, hızlı tren, otobüs | istanbuldan-sapancaya-ulasim | lake | Tren seferleri ve duraklar için güncel resmi kaynağı (TCDD) kontrol et; süreleri yaklaşık ver. | yayın: 2026-10-26
 - [x] Kartepe mi Sapanca mı? Kış kaçamağı karşılaştırması | kartepe-mi-sapanca-mi | snow | | yayın: 2026-10-29
 - [x] Hafta içi bungalov tatili: neden daha mantıklı? | hafta-ici-bungalov-tatili | inside | | yayın: 2026-11-02
-- [ ] Sapanca'da yağmurlu günde ne yapılır? | sapanca-yagmurlu-gunde-ne-yapilir | fireplace |
+- [x] Sapanca'da yağmurlu günde ne yapılır? | sapanca-yagmurlu-gunde-ne-yapilir | fireplace | | yayın: 2026-11-05
 - [ ] Bungalovda doğum günü ve yıl dönümü sürprizi | bungalovda-dogum-gunu-surprizi | stars |
 - [ ] Sapanca'da kahvaltı: bungalova servis mi, köy kahvaltısı mı? | sapanca-kahvalti-rehberi | inside | Belirli işletme adı verme.
 - [ ] Maşukiye'de bungalov: Kartepe eteklerinde konaklama rehberi | masukiye-bungalov | forestlake | bolge: kocaeli/kartepe. Maşukiye'nin konumunu, Sapanca'ya ve Kartepe kayak merkezine yaklaşık uzaklığını web aramasıyla doğrula. İşletme adı verme.
