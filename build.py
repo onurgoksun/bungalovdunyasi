@@ -60,7 +60,7 @@ def cover(key):
             f'sizes="(max-width: 1120px) 100vw, 1080px" alt="{esc(PHOTOS[key][1])}" width="1600" height="800">'
             f'<figcaption>{credit(key)}</figcaption></figure>')
 
-NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/uygulama/", "İşletmeciler için"), ("/hakkimizda/", "Hakkımızda")]
+NAV = [("/tesisler/", "Tesisler"), ("/rehber/", "Rehber"), ("/isletmeciler/", "İşletmeciler için"), ("/hakkimizda/", "Hakkımızda")]
 
 
 def _hash(*paths):
@@ -606,7 +606,7 @@ def owner_band():
       <li>Ücretsiz Bungalov Yönetim uygulaması: takvim, rezervasyon ve misafir mesajları tek yerde</li>
       <li>Kendi web sitenize ekleyebileceğiniz rezervasyon sayfası</li>
     </ul>
-    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/tesis-ekle/">Tesisinizi ekleyin</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
+    <p class="actions" style="margin-top:20px"><a class="btn ember" href="/isletmeciler/">Ücretsiz katılın</a><a class="btn ghost-light" href="/uygulama/">Uygulamayı inceleyin</a></p>
   </div>
 </div></section>"""
 
@@ -1315,6 +1315,114 @@ def build_app():
                              "Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları, bayram fiyatları ve gelir-gider tek uygulamada. Bungalov Dünyası'ndaki tesislere ücretsiz.",
                              body, schema, active="/uygulama/", og_image=SITE + "/img/uygulama/takvim.webp"))
 
+# ---------------------------------------------------------------- İşletmeciler: ücretsiz ilan + ücretsiz uygulama
+OWNER_FAQ = [
+    ("Gerçekten ücretsiz mi?", "Evet. Üyelik, tesis sayfası, partner rozeti ve Bungalov Yönetim uygulaması ücretsiz. Kurulum ücreti, aylık ücret ya da rezervasyon başına komisyon yok."),
+    ("Misafir bana nasıl ulaşıyor?", "Tesis sayfanızdaki WhatsApp ve telefon düğmeleriyle doğrudan size yazar ya da sizi arar. Rezervasyon sayfanızdan talep bırakırsa talep uygulamanıza düşer. Araya biz girmeyiz, ödemeyi de doğrudan siz alırsınız."),
+    ("Airbnb ve Booking'de de ilanım var, sorun olur mu?", "Olmaz. Oralardaki ilanlarınız aynen devam eder. İlanınızın takvim bağlantısını uygulamaya eklediğinizde o rezervasyonlar da takviminize kendiliğinden gelir; aynı geceye iki rezervasyon girilmesinin önüne geçer."),
+    ("Tesisim Sapanca'da değil, ekleyebilir miyim?", "Evet. Türkiye'nin her ilindeki bungalov tesisleri eklenebilir. Tesisinizi eklediğinizde il ve ilçe sayfası da kendiliğinden oluşur."),
+    ("Bilgisayardan pek anlamam, kurabilir miyim?", "Tesis sayfasını doldurmak birkaç dakikanızı alır. Uygulamanın kurulumunu ise WhatsApp'tan yazmanız yeterli; sizinle birlikte yaparız, ilk rezervasyonları beraber gireriz."),
+    ("Bilgilerim kimde duruyor?", "Rezervasyon ve misafir bilgileriniz tesisinize ait bulut hesabında durur, başka tesisler göremez. Tesis sayfanızı istediğiniz zaman düzenler ya da yayından kaldırırsınız."),
+]
+
+
+def build_owners():
+    msg = wa("Merhaba, tesisimi Bungalov Dünyası'na eklemek ve Bungalov Yönetim uygulamasını kullanmak istiyorum. Tesis adı: [ ], il/ilçe: [ ], bungalov sayısı: [ ].")
+    L = LABELLA
+    card = f"""<div class="mock-card" aria-hidden="true">
+      <img src="{UP + L['shots'][0][0]}" alt="" width="410" height="512" loading="eager">
+      <div class="mock-body"><strong>{esc(L['name'])}</strong><span>{esc(L['district'])}, {esc(L['province'])}</span>
+      <div class="mock-tags"><i>Özel havuz</i><i class="w">Sıcak jakuzi</i><i class="w">Şömine</i></div>
+      <div class="mock-btns"><b>WhatsApp</b><b class="o">Ara</b></div></div>
+      <img class="mock-seal" src="/rozet/muhur.svg" alt="" width="84" height="84">
+    </div>"""
+    pack = [
+        ("01", "Ücretsiz tesis sayfası", "Fotoğraflarınız, olanaklarınız, kurallarınız ve harita konumunuzla kendi sayfanız. Kaydettiğiniz anda yayında, Google'da ve bölge sayfalarında görünür.",
+         ["Misafir tek tuşla WhatsApp'tan yazar ya da arar", "İl ve ilçe sayfasında listelenirsiniz", "İstediğiniz zaman kendiniz düzenlersiniz"]),
+        ("02", "Ücretsiz Bungalov Yönetim uygulaması", "Rezervasyon takvimi, kapora takibi, hazır WhatsApp mesajları, bayram fiyatları ve ayın hesabı tek yerde. Bilgisayarda, Android'de, iPhone ve iPad'de çalışır.",
+         ["Airbnb ve Booking rezervasyonları kendiliğinden gelir", "Aynı geceye iki rezervasyon girilemez", "Ekibinize ayrı kullanıcılar"]),
+        ("03", "Kendi rezervasyon sayfanız", "Misafirin boş tarihlerinizi görüp talep bıraktığı sayfa. Instagram'ınıza ve web sitenize eklersiniz; talepler uygulamanıza düşer.",
+         ["Yeni talepte iPhone'unuza bildirim", "Talebi tek dokunuşla rezervasyona çevirirsiniz"]),
+        ("04", "Partner rozeti", "Ölçütlerimize uyan tesislere Bungalov Dünyası partner rozeti. Web sitenize ve Instagram'ınıza koyarsınız; tıklayan misafir sayfanızı görür.",
+         ["Gerçek fotoğraf ve doğru olanak bilgisi güvencesi", "Rozet kodu Hesabım sayfasında hazır"]),
+    ]
+    cards = "".join(f"""<article class="pack-card"><span class="pack-no">{n}</span><h3>{esc(t)}</h3><p>{esc(d)}</p><ul class="ticks">{''.join(f'<li>{esc(x)}</li>' for x in pts)}</ul></article>""" for n, t, d, pts in pack)
+    steps = [
+        ("Ücretsiz üye olun", "E-posta adresinizle kurumsal üyelik açın. İki dakika sürer."),
+        ("Tesisinizi ekleyin", "Fotoğrafları yükleyin, olanakları işaretleyin, konumu seçin. Kaydettiğiniz anda sayfanız yayında."),
+        ("Uygulamayı birlikte kuralım", "WhatsApp'tan yazın; Airbnb ve Booking takviminizi bağlayalım, ilk rezervasyonları beraber girelim."),
+    ]
+    step_html = "".join(f'<li><span class="step-no">{i}</span><h3>{esc(t)}</h3><p>{esc(d)}</p></li>' for i, (t, d) in enumerate(steps, 1))
+    rows = [
+        ("Rezervasyon başına komisyon", "Yok", "Her rezervasyondan kesilir"),
+        ("Misafirle iletişim", "Doğrudan WhatsApp ve telefon", "Çoğunlukla site üzerinden"),
+        ("Ödeme", "Doğrudan size gelir", "Site üzerinden aktarılır"),
+        ("Rezervasyon ve takvim uygulaması", "Ücretsiz dahil", "Ayrıca bulmanız gerekir"),
+    ]
+    trs = "".join(f"<tr><th scope=\"row\">{esc(a)}</th><td class=\"us\">{esc(b)}</td><td>{esc(c)}</td></tr>" for a, b, c in rows)
+    faq = "".join(f"<h3>{esc(q)}</h3><p>{esc(a)}</p>" for q, a in OWNER_FAQ)
+    body = f"""
+<section class="app-hero owner-hero"><div class="wrap">
+  {crumbs([(None, "İşletmeciler için")])}
+  <div class="app-hero-grid">
+    <div class="app-hero-copy">
+      <p class="kicker">Bungalov işletmecileri için · ücretsiz</p>
+      <h1>Tesisiniz listelensin, rezervasyonlarınız tek uygulamada.</h1>
+      <p class="lead">Bungalov Dünyası'na katılan tesisler iki şeyi ücretsiz alır: misafirin size doğrudan ulaştığı bir tesis sayfası ve rezervasyonları, kaporayı, mesajları tek yerde tutan Bungalov Yönetim uygulaması. Komisyon yok.</p>
+      <div class="actions"><a class="btn ember" href="/uye/?tur=kurumsal">Ücretsiz üye olun</a><a class="btn ghost-light" href="{msg}" rel="noopener">WhatsApp'tan yazın</a></div>
+      <p class="hero-note">Kurulumu sizinle birlikte yapıyoruz.</p>
+    </div>
+    <div class="owner-visual">
+      <figure class="screen hero-screen"><img src="/img/uygulama/takvim.webp" srcset="/img/uygulama/takvim-720.webp 720w, /img/uygulama/takvim.webp 1440w" sizes="(max-width: 860px) 100vw, 620px" width="1440" height="900" alt="Bungalov Yönetim takvim ekranı (örnek veriler)" loading="eager"></figure>
+      {card}
+    </div>
+  </div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="head"><h2>Neler ücretsiz?</h2><p>Dört parça, tek üyelik. Hepsi birbirine bağlı çalışır: sayfanızdan gelen talep uygulamanıza düşer, takviminiz güncel kalır.</p></div>
+  <div class="pack-grid">{cards}</div>
+</div></section>
+
+<section class="block mist"><div class="wrap">
+  <div class="head"><h2>Nasıl başlarsınız?</h2></div>
+  <ol class="steps">{step_html}</ol>
+  <p class="actions" style="margin-top:28px"><a class="btn solid" href="/uye/?tur=kurumsal">Ücretsiz üye olun</a><a class="btn line" href="/tesis-ekle/">Tesisinizi ekleyin</a></p>
+</div></section>
+
+<section class="block"><div class="wrap narrow">
+  <h2>Büyük rezervasyon sitelerinden farkı</h2>
+  <p>Airbnb ve Booking gibi sitelerdeki ilanlarınız aynen devam edebilir. Bungalov Dünyası onların yerine değil, yanına konur: misafir sizi bulduğunda araya kimse girmez.</p>
+  <div class="table-wrap"><table class="compare">
+    <thead><tr><th></th><th class="us">Bungalov Dünyası</th><th>Büyük rezervasyon siteleri</th></tr></thead>
+    <tbody>{trs}</tbody>
+  </table></div>
+</div></section>
+
+<section class="block mist"><div class="wrap narrow">
+  <h2>Kimiz?</h2>
+  <p>Bungalov Dünyası'nı ve Bungalov Yönetim uygulamasını, Sapanca'da beş bungalovluk Labella Bungalov'u işleten ekip hazırlıyor. Uygulamayı önce kendi işimiz için yaptık ve her gün kullanıyoruz; rehberi de misafirin doğru tesisi bulması için yazıyoruz. Rehber yazılarımız ve bölge sayfalarımız, tatil arayan misafiri tesis sayfalarına yönlendirir.</p>
+  <p class="disclose">Açıklık notu: Ekran görüntüleri örnek verilerle hazırlandı. Tesis kartındaki örnek, kendi tesisimiz Labella Bungalov'dur.</p>
+  <p><a href="/uygulama/">Uygulamanın bütün özelliklerini görün</a> · <a href="/rozet/">Partner rozeti ölçütleri</a></p>
+</div></section>
+
+<section class="block"><div class="wrap narrow">
+  <h2>Sık sorulanlar</h2>
+  {faq}
+</div></section>
+
+<section class="band"><div class="wrap">
+  <div><h2>Tesisinizi bu hafta ekleyelim</h2><p>Üye olup tesisinizi kendiniz ekleyebilirsiniz. Ya da WhatsApp'tan yazın; fotoğrafları gönderin, sayfanızı ve uygulamanızı birlikte hazırlayalım.</p></div>
+  <div class="actions"><a class="btn ember" href="/uye/?tur=kurumsal">Ücretsiz üye olun</a><a class="btn ghost-light" href="{msg}" rel="noopener">WhatsApp'tan yazın</a></div>
+</div></section>
+"""
+    schema = [{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+                  {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in OWNER_FAQ]},
+              crumbs_ld([("/isletmeciler/", "İşletmeciler için")])]
+    write("/isletmeciler/", page("/isletmeciler/", "Bungalov Tesisinizi Ücretsiz Ekleyin: İlan + Rezervasyon Uygulaması",
+                                 "Bungalov tesisinizi Bungalov Dünyası'na ücretsiz ekleyin: komisyonsuz tesis sayfası, ücretsiz rezervasyon uygulaması, kendi rezervasyon sayfanız ve partner rozeti.",
+                                 body, schema, active="/isletmeciler/", og_image=SITE + "/img/uygulama/takvim.webp"))
+
 
 def build_about():
     body = f"""
@@ -1355,7 +1463,7 @@ def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
     urls = [("/", newest), ("/tesisler/", max([str(l.get("updated_at") or "")[:10] for l in LISTINGS] + ["2026-10-13"])), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
         [(f'/rehber/{g["slug"]}/', g.get("updated") or g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
-        [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14"), ("/rozet/", "2026-10-15")] + \
+        [("/isletmeciler/", "2026-11-12"), ("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14"), ("/rozet/", "2026-10-15")] + \
         [(region_path(*k), max([str(l.get("updated_at") or "")[:10] for l in r["listings"]] + ["2026-10-14"])) for k, r in REGIONS.items()] + \
         [(region_path(il), "2026-10-14") for il in PROVINCES]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -1386,7 +1494,7 @@ if __name__ == "__main__":
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
-    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_about(); build_404()
+    build_home(); build_facilities(); build_labella(); build_guides(); build_owner(); build_app(); build_owners(); build_about(); build_404()
     build_member(); build_account(); build_listing_shell(); build_legal(); build_regions(); build_badge()
     for _l in LISTINGS:
         build_listing(_l)
