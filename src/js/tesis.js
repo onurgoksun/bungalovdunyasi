@@ -74,13 +74,13 @@
 
     if (photos.length) {
       var cls = "gallery" + (photos.length === 1 ? " n1" : photos.length < 5 ? " few" : "");
-      root.appendChild(el("div", { class: cls }, photos.slice(0, 9).map(function (ph, i) {
+      root.appendChild(el("div", { class: cls }, photos.slice(0, 5).map(function (ph, i) {
         return el("a", { href: BD.photoUrl(ph.path), target: "_blank", rel: "noopener" }, [
           el("img", { src: BD.photoUrl(ph.path), alt: (ph.alt ? ph.alt + " — " : "") + l.name, loading: i ? "lazy" : "eager" })]);
       })));
-      if (photos.length > 9) {
+      if (photos.length > 5) {
         var more = el("details", { class: "more-photos" }, [el("summary", { text: "Bütün fotoğraflar (" + photos.length + ")" }),
-          el("div", { class: "gallery" }, photos.slice(9).map(function (ph) {
+          el("div", { class: "gallery-all" }, photos.map(function (ph) {
             return el("a", { href: BD.photoUrl(ph.path), target: "_blank", rel: "noopener" }, [el("img", { src: BD.photoUrl(ph.path), alt: ph.alt || l.name, loading: "lazy" })]);
           }))]);
         root.appendChild(more);

@@ -46,10 +46,17 @@ p { margin: 0 0 1em; }
 .nav a { white-space: nowrap; }
 @media (max-width: 1080px) { .top .wrap { gap: 16px; } .nav { gap: 14px; font-size: 15px; } .nav .owner { padding: 9px 13px; } .logo { font-size: 18px; } }
 @media (max-width: 900px) and (min-width: 721px) { .nav a[href="/hakkimizda/"] { display: none; } }
+.menu-btn { display: none; }
 @media (max-width: 720px) {
-  .top .wrap { flex-wrap: wrap; gap: 4px 16px; padding-top: 10px; padding-bottom: 10px; }
-  .nav { margin-left: 0; width: 100%; gap: 6px 16px; font-size: 15px; flex-wrap: wrap; align-items: center; }
-  .nav .owner { padding: 8px 12px; white-space: nowrap; }
+  .top .wrap { flex-wrap: wrap; gap: 0; min-height: 58px; }
+  .menu-btn { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; background: none; border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 14px; font: 600 15px/1 var(--head); color: var(--ink); cursor: pointer; }
+  .menu-btn span, .menu-btn span::before, .menu-btn span::after { display: block; width: 16px; height: 2px; background: var(--ink); border-radius: 2px; position: relative; content: ""; }
+  .menu-btn span::before { position: absolute; top: -5px; }
+  .menu-btn span::after { position: absolute; top: 5px; }
+  .nav { display: none; margin: 0; width: 100%; flex-direction: column; gap: 0; font-size: 17px; padding: 6px 0 14px; }
+  .top.open .nav { display: flex; }
+  .nav a { padding: 13px 2px; border-bottom: 1px solid var(--line); }
+  .nav .owner { margin-top: 12px; text-align: center; justify-content: center; border-bottom: 0; padding: 14px 16px; }
 }
 
 /* Hero — tam genişlik fotoğraf */
@@ -159,10 +166,6 @@ section.block.mist { background: var(--mist); }
 @media (max-width: 960px) { .layout { grid-template-columns: 1fr; gap: 0; } .aside { position: static; margin-bottom: 56px; } }
 
 /* Facility page */
-.gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 8px 0 36px; }
-.gallery img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 6px; background: var(--mist); }
-.gallery img:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; height: 100%; }
-@media (max-width: 720px) { .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gallery img:first-child { grid-row: span 1; aspect-ratio: 4 / 5; } }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 0 32px; }
 .facts div { padding: 16px 14px 16px 0; }
 .facts dt { font: 500 14px/1.2 var(--head); color: var(--stone); margin-bottom: 6px; }
@@ -337,23 +340,7 @@ p.hint { margin: 0 0 14px; }
 .fac .shots.one { grid-template-columns: 1fr; grid-template-rows: 1fr; }
 .fac .shots.one img:first-child { grid-row: auto; border-radius: 6px 6px 6px 22px; }
 .more-link { margin: 32px 0 0; }
-.gallery a { display: block; }
-.gallery a img { width: 100%; height: 100%; }
-.gallery a:first-child { grid-column: span 2; grid-row: span 2; }
-.gallery a:first-child img { aspect-ratio: auto; height: 100%; }
-.gallery a:not(:first-child) img { aspect-ratio: 4 / 5; }
-.gallery.n1 { grid-template-columns: 1fr; }
-.gallery.n1 a:first-child { grid-column: auto; grid-row: auto; }
-.gallery.n1 a img, .gallery.few a:first-child img { aspect-ratio: 16 / 9; height: auto; }
-.gallery.few { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.gallery.few a:first-child { grid-column: 1 / -1; grid-row: auto; }
-.gallery.few a:not(:first-child) img { aspect-ratio: 4 / 3; }
-@media (max-width: 720px) { .gallery a:first-child { grid-row: span 1; } .gallery a:first-child img { aspect-ratio: 4 / 3; } }
-.more-photos { margin: -20px 0 36px; }
-.more-photos summary { cursor: pointer; font: 600 16px/1.4 var(--head); color: var(--pine); margin-bottom: 12px; }
-.more-photos .gallery { margin: 0; }
-.more-photos .gallery a:first-child { grid-column: auto; grid-row: auto; }
-.more-photos .gallery a img { aspect-ratio: 4 / 5; }
+.more-photos { margin: 0 0 36px; }
 .map { border-radius: 10px; overflow: hidden; aspect-ratio: 16 / 9; background: var(--mist); }
 .map iframe { width: 100%; height: 100%; border: 0; }
 .fav-row { display: flex; gap: 10px; align-items: center; margin-top: 18px; flex-wrap: wrap; }
@@ -427,3 +414,23 @@ pre.code { white-space: pre-wrap; word-break: break-all; background: #fff; borde
   .steps { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) { .pack-grid { grid-template-columns: 1fr; } .mock-card { width: 180px; } }
+
+/* Tesis galerisi: büyük fotoğraf + 4 küçük; geri kalanı "Bütün fotoğraflar" altında */
+.gallery { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: clamp(320px, 40vw, 480px); margin: 8px 0 14px; border-radius: 14px; overflow: hidden; }
+.gallery > * { display: block; min-height: 0; min-width: 0; }
+.gallery > :first-child { grid-row: 1 / 3; }
+.gallery img { width: 100%; height: 100%; object-fit: cover; background: var(--mist); display: block; }
+.gallery > :nth-child(n+6) { display: none; }
+.gallery.n1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+.gallery.few { grid-template-columns: 2fr 1fr; }
+.gallery.few > :nth-child(n+4) { display: none; }
+.gallery.few > :nth-child(2):last-child { grid-row: 1 / 3; }
+.gallery-all { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 14px; }
+.gallery-all img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--mist); }
+.more-photos summary { cursor: pointer; font: 600 15px/1 var(--head); color: var(--ink); display: inline-block; padding: 11px 16px; border: 1.5px solid var(--ink); border-radius: 999px; }
+@media (max-width: 720px) {
+  .gallery { display: flex; height: 300px; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 12px; gap: 6px; }
+  .gallery > * { flex: 0 0 86%; scroll-snap-align: start; }
+  .gallery > :nth-child(n+6), .gallery.few > :nth-child(n+4) { display: block; }
+  .gallery.n1 > * { flex-basis: 100%; }
+}

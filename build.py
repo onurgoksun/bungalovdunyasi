@@ -132,7 +132,8 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <a class="skip" href="#icerik">İçeriğe geç</a>
 <header class="top"><div class="wrap">
   <a class="logo" href="/">{LOGO_SVG}{NAME}</a>
-  <nav class="nav" aria-label="Ana menü">{nav}<a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/tesis-ekle/">Tesisinizi ekleyin</a></nav>
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="ana-menu" onclick="var t=this.closest('.top');t.classList.toggle('open');this.setAttribute('aria-expanded',t.classList.contains('open'))"><span></span>Menü</button>
+  <nav class="nav" id="ana-menu" aria-label="Ana menü">{nav}<a id="acct-link" class="acct" href="/uye/">Giriş yap</a><a class="owner" href="/isletmeciler/">Tesisinizi ekleyin</a></nav>
 </div></header>
 <main id="icerik">
 {body}
@@ -193,12 +194,15 @@ LABELLA = {
     "shots": [("labella-bungalov-sapanca-6-819x1024.webp", "A-frame bungalov ve özel havuz, havadan"),
               ("labella-bungalov-sapanca-38-733x1024.webp", "Gece aydınlatmalı A-frame bungalov ve havuz"),
               ("labella-bungalov-sapanca-27-733x1024.webp", "Bungalov iç mekânı, oturma alanı")],
-    "gallery": [("labella-bungalov-sapanca-14-819x1024.webp", "Havadan bungalovlar ve özel havuzlar"),
+    # Tesis sayfası galerisi: ilk 5'i büyük galeride görünür (ilki ana fotoğraf)
+    "gallery": [("labella-bungalov-sapanca-38-733x1024.webp", "Gece aydınlatmalı A-frame bungalov ve havuz"),
                 ("labella-bungalov-sapanca-39-733x1024.webp", "A-frame bungalov ve özel yüzme havuzu"),
-                ("labella-bungalov-sapanca-32-733x1024.webp", "Salon oturma grubu"),
-                ("labella-bungalov-sapanca-28-733x1024.webp", "Çift kişilik yatak odası"),
+                ("labella-bungalov-sapanca-27-733x1024.webp", "Bungalov iç mekânı, oturma alanı"),
                 ("labella-bungalov-sapanca-36-819x1024.webp", "Ateş çukuru ve havuz, gece havadan"),
-                ("labella-bungalov-sapanca-33-819x1024.webp", "Teras oturma alanında akşam"),
+                ("labella-bungalov-sapanca-28-733x1024.webp", "Çift kişilik yatak odası"),
+                ("labella-bungalov-sapanca-6-819x1024.webp", "A-frame bungalov ve özel havuz, havadan"),
+                ("labella-bungalov-sapanca-14-819x1024.webp", "Havadan bungalovlar ve özel havuzlar"),
+                ("labella-bungalov-sapanca-32-733x1024.webp", "Salon oturma grubu"),
                 ("labella-bungalov-sapanca-10-819x1024.webp", "Çim bahçe, salıncak ve mangal"),
                 ("labella-bungalov-sapanca-40-733x1024.webp", "Havuz şelalesi, gece")],
     "site": "https://labellabungalov.com/",
@@ -439,11 +443,11 @@ def build_listing(l):
     gcls = "gallery" + (" n1" if len(photos) == 1 else " few" if len(photos) < 5 else "")
     gal = "".join(f'<a href="{photo_url(p["path"])}" target="_blank" rel="noopener"><img src="{photo_url(p["path"])}" '
                   f'alt="{esc((p.get("alt") + " — ") if p.get("alt") else "")}{esc(name)}" loading="{"eager" if i == 0 else "lazy"}"></a>'
-                  for i, p in enumerate(photos[:9]))
+                  for i, p in enumerate(photos[:5]))
     more = ""
-    if len(photos) > 9:
-        rest = "".join(f'<a href="{photo_url(p["path"])}" target="_blank" rel="noopener"><img src="{photo_url(p["path"])}" alt="{esc(p.get("alt") or name)}" loading="lazy"></a>' for p in photos[9:])
-        more = f'<details class="more-photos"><summary>Bütün fotoğraflar ({len(photos)})</summary><div class="gallery">{rest}</div></details>'
+    if len(photos) > 5:
+        rest = "".join(f'<a href="{photo_url(p["path"])}" target="_blank" rel="noopener"><img src="{photo_url(p["path"])}" alt="{esc(p.get("alt") or name)}" loading="lazy"></a>' for p in photos)
+        more = f'<details class="more-photos"><summary>Bütün fotoğraflar ({len(photos)})</summary><div class="gallery-all">{rest}</div></details>'
     facts = []
     if l.get("units"):
         facts.append(("Bungalov sayısı", str(l["units"])))
@@ -686,8 +690,11 @@ def build_regions():
 def build_labella():
     f = LABELLA
     path = f'/tesisler/{f["slug"]}/'
-    gal = "".join(f'<img src="{UP}{s}" alt="{esc(a)} — {esc(f["name"])}" loading="{"eager" if i == 0 else "lazy"}" width="733" height="1024">'
-                  for i, (s, a) in enumerate([f["shots"][0]] + f["gallery"]))
+    pics = f["gallery"]
+    gal = "".join(f'<a href="{UP}{s}" target="_blank" rel="noopener"><img src="{UP}{s}" alt="{esc(a)} — {esc(f["name"])}" loading="{"eager" if i == 0 else "lazy"}" width="733" height="1024"></a>'
+                  for i, (s, a) in enumerate(pics[:5]))
+    allpics = "".join(f'<a href="{UP}{s}" target="_blank" rel="noopener"><img src="{UP}{s}" alt="{esc(a)} — {esc(f["name"])}" loading="lazy" width="733" height="1024"></a>' for s, a in pics)
+    gal_more = f'<details class="more-photos"><summary>Bütün fotoğraflar ({len(pics)})</summary><div class="gallery-all">{allpics}</div></details>'
     tags = "".join(f'<li class="{c}">{esc(t)}</li>' for t, c in f["tags"])
     amen = ["Bungalova özel açık yüzme havuzu (ısıtmalı)", "Terasta sıcak jakuzi", "Şömine", "Tam donanımlı mutfak", "Klima",
             "Smart TV", "Ücretsiz Wi-Fi", "Barbekü ve mangal alanı", "Ateş çukuru", "Bahçe salıncağı", "Orman manzarası", "Özel otopark"]
@@ -699,6 +706,7 @@ def build_labella():
 <p>{esc(f["summary"])}</p>
 <ul class="tags" style="margin-top:18px">{tags}</ul></header>
 <div class="gallery">{gal}</div>
+{gal_more}
 <div class="layout">
 <div class="prose">
   <dl class="facts">
@@ -737,7 +745,7 @@ def build_labella():
     lodging = {
         "@context": "https://schema.org", "@type": "LodgingBusiness", "name": f["name"], "url": f["site"],
         "description": f["summary"], "telephone": f["phone"],
-        "image": [UP + s for s, _ in [f["shots"][0]] + f["gallery"][:4]],
+        "image": [UP + s for s, _ in f["gallery"][:5]],
         "address": {"@type": "PostalAddress", "streetAddress": f["address"]["street"], "addressLocality": f["address"]["locality"],
                     "addressRegion": f["address"]["region"], "addressCountry": "TR"},
         "checkinTime": "14:00", "checkoutTime": "11:30", "numberOfRooms": 5,
