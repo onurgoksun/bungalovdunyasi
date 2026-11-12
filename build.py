@@ -231,8 +231,8 @@ def fac_row(f):
 
 
 SLOT = f"""<div class="slot">
-  <p><strong>Bungalov tesisi mi işletiyorsunuz?</strong>Hangi ilde olursa olsun tesisinizi ücretsiz ekleyin. Misafirler size doğrudan ulaşır, komisyon ödemezsiniz.</p>
-  <a class="btn solid" href="/tesis-ekle/">Tesisinizi ekleyin</a>
+  <p><strong>Bungalov tesisi mi işletiyorsunuz?</strong>Hangi ilde olursa olsun tesisinizi ücretsiz ekleyin; rezervasyon uygulaması da ücretsiz. Misafirler size doğrudan ulaşır, komisyon ödemezsiniz.</p>
+  <a class="btn solid" href="/isletmeciler/">Nasıl çalışır?</a>
 </div>"""
 
 # ---------------------------------------------------------------- Rehber yazıları
@@ -348,10 +348,13 @@ def region_count(key):
     return len(r["listings"]) + (1 if r["labella"] else 0)
 
 
-def region_chips(current=None):
+def region_chips(current=None, counts=True):
     keys = sorted(REGIONS, key=lambda k: (-region_count(k), k[1]))
-    return "".join(f'<a href="{region_path(*k)}"{" aria-current=\"page\"" if k == current else ""}>{esc(k[1])}<small>{esc(k[0])} · {region_count(k)}</small></a>'
+    return "".join(f'<a href="{region_path(*k)}"{" aria-current=\"page\"" if k == current else ""}>{esc(k[1])}<small>{esc(k[0])}{f" · {region_count(k)} tesis" if counts else ""}</small></a>'
                    for k in keys)
+
+
+SOON = [("Kartepe", "Kocaeli"), ("Şile ve Ağva", "İstanbul"), ("Abant", "Bolu"), ("Karadeniz yaylaları", "Rize, Trabzon")]
 PETS = {"evet": "Evcil hayvan kabul edilir", "hayir": "Evcil hayvan kabul edilmez", "sor": "Evcil hayvan için önceden sorun"}
 
 
@@ -554,8 +557,8 @@ def build_home():
   <img class="hero-img" src="{ux('hero', 1920, 1100)}" srcset="{ux('hero', 900, 1100)} 900w, {ux('hero', 1920, 1100)} 1920w" sizes="100vw" alt="{esc(PHOTOS['hero'][1])}" fetchpriority="high">
   <div class="wrap">
     <div class="copy">
-      <h1>Bungalov tatili, fotoğrafın ötesiyle.</h1>
-      <p class="lead">Havuz gerçekten özel mi, jakuzi kışın sıcak mı, şömine yanıyor mu? Türkiye'deki bungalov tesislerini ayrıntısıyla anlatıyor, sizi doğrudan tesisle buluşturuyoruz.</p>
+      <h1>Özel havuzlu, jakuzili bungalovlar. Komisyonsuz.</h1>
+      <p class="lead">Türkiye'deki bungalov tesislerini gerçek fotoğraflarıyla ve açık bilgileriyle anlatıyoruz. Beğendiğiniz tesisle WhatsApp'tan ya da telefonla doğrudan konuşursunuz; araya kimse girmez.</p>
       <div class="find" aria-label="Ne arıyorsunuz?">{find}</div>
     </div>
     <p class="hero-credit">{credit('hero')}</p>
@@ -564,7 +567,7 @@ def build_home():
 
 <section class="block"><div class="wrap">
   <div class="head"><h2>Bölgeler</h2><p>Rehbere Sapanca'daki tesislerle başladık. Karadeniz yaylalarından Ege ve Akdeniz kıyısına, yeni bölgeler tesis sahipleri katıldıkça ekleniyor.</p></div>
-  <nav class="regions" aria-label="Bölgeler">{region_chips()}<a class="add" href="/tesis-ekle/">+ Bölgenizdeki tesisi ekleyin</a></nav>
+  <nav class="regions" aria-label="Bölgeler">{region_chips(counts=False)}{"".join(f'<span class="soon">{esc(a)}<small>{esc(b)} · yakında</small></span>' for a, b in SOON if not any(k[1] == a for k in REGIONS))}<a class="add" href="/isletmeciler/">+ Bölgenizdeki tesisi ekleyin</a></nav>
 </div></section>
 
 <section class="block" style="padding-top:0"><div class="wrap">
@@ -578,8 +581,8 @@ def build_home():
 </div></section>
 
 <section class="block mist"><div class="wrap">
-  <div class="head"><h2>Rehber</h2><p>Bungalov seçerken işinize yarayacak kısa ve somut yazılar.</p></div>
-  {guide_list()}
+  <div class="head"><h2>Rehber</h2><p>Bungalov seçerken işinize yarayacak kısa ve somut yazılar. Haftada iki yeni yazı.</p></div>
+  {guide_list(6)}
 </div></section>
 
 {owner_band()}
@@ -593,9 +596,11 @@ def build_home():
                     body, schema))
 
 
-def guide_list():
-    items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min">{g["minutes"]} dk okuma</span></a></li>' for g in GUIDES)
-    return f'<ul class="guides">{items}</ul>'
+def guide_list(limit=None):
+    gs = GUIDES[:limit] if limit else GUIDES
+    items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min"><time datetime="{g["date"]}">{tr_date(g["date"])}</time><span>{g["minutes"]} dk okuma</span></span></a></li>' for g in gs)
+    more = f'<p class="more-link"><a class="btn line" href="/rehber/">Bütün yazılar ({len(GUIDES)})</a></p>' if limit and len(GUIDES) > limit else ""
+    return f'<ul class="guides">{items}</ul>{more}'
 
 
 def owner_band():
@@ -644,7 +649,7 @@ def build_regions():
         guides = [g for g in GUIDES if g["bolge"] == f"{tr_slug(il)}/{tr_slug(ilce)}"]
         g_html = ""
         if guides:
-            items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min">{g["minutes"]} dk okuma</span></a></li>' for g in guides)
+            items = "".join(f'<li><a href="/rehber/{g["slug"]}/"><img src="{ux(g["img"], 360, 240)}" alt="" loading="lazy" width="180" height="120"><h3>{esc(g["title"])}</h3><p>{esc(g["desc"])}</p><span class="min"><time datetime="{g["date"]}">{tr_date(g["date"])}</time><span>{g["minutes"]} dk okuma</span></span></a></li>' for g in guides)
             g_html = f'<section class="block mist"><div class="wrap"><div class="head"><h2>{esc(ilce)} rehberi</h2></div><ul class="guides">{items}</ul></div></section>'
         n = region_count((il, ilce))
         body = f"""
