@@ -32,4 +32,7 @@ jobs:
           git add -A content/ilanlar.json docs
           git commit -m "Tesis sayfaları güncellendi"
           git pull --rebase -X theirs origin main || { git rebase --abort; git reset --hard origin/main; python3 build.py; git add -A content/ilanlar.json docs; git commit -m "Tesis sayfaları güncellendi"; }
+          BEFORE=$(git rev-parse origin/main)
           git push origin HEAD:main
+          sleep 90
+          python3 tools/indexnow.py "$BEFORE" HEAD || true

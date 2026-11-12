@@ -8,6 +8,12 @@ Bu dosya, rehber yazılarını yazan kişi ya da otomatik görev içindir.
 - `body` içinde yalnızca şu etiketler: `p`, `h2`, `h3`, `ul`, `ol`, `li`, `strong`, `a`, `div class="note"`, `div class="note warm"`, `ul class="checklist"`. `h1` kullanmayın (başlık otomatik).
 - İç bağlantılar `/rehber/<slug>/`, `/tesisler/labella-bungalov/`, `/bolge/sakarya/sapanca/`, `/tesis-ekle/` biçiminde. En az bir ilgili rehber yazısına bağlantı verin.
 
+## Arama motoru (SEO)
+- SIRA.md'deki "Anahtar kelime" ifadesi `title`, `seo_title`, `description` ve ilk paragrafta doğal biçimde geçsin; ilk paragraf sorunun kısa yanıtını versin.
+- `h2` başlıkları insanların gerçekten aradığı soruları karşılasın (ör. "Kışın jakuziye girilir mi?").
+- En az 2 ilgili rehber yazısına metin içinden bağlantı verin; mümkünse eski bir yazıya da yeni yazıya bağlantı ekleyin.
+- Eski bir yazıyı esaslı biçimde güncellerseniz `date`'i değiştirmeyin, `"updated": "YYYY-MM-DD"` ekleyin.
+
 ## Kapsam
 - Site Türkiye genelindeki bungalov tesislerini kapsar; ilk ve en ayrıntılı bölge Sapanca. Başka bölgeler hakkında yazarken de aynı doğruluk kurallarına uyun.
 

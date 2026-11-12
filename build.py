@@ -4,6 +4,13 @@ import html, json, os, re, shutil, datetime, urllib.request
 from urllib.parse import quote
 
 SITE = "https://bungalovdunyasi.com"
+INDEXNOW_KEY = "3187771fb0d63af2ac1d2aa0fa04abdf"  # Bing/Yandex hızlı dizinleme anahtarı (docs/<anahtar>.txt)
+AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+
+
+def tr_date(d):
+    y, m, g = d.split("-")
+    return f"{int(g)} {AYLAR[int(m) - 1]} {y}"
 NAME = "Bungalov Dünyası"
 WA = "905327222545"
 TODAY = datetime.date.today().isoformat()
@@ -114,6 +121,7 @@ def page(path, title, desc, body, schema=None, active=None, og_image=None, scrip
 <meta property="og:image" content="{og}">
 <meta name="theme-color" content="#15302b">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Bungalov Dünyası rehber yazıları" href="/rehber/feed.xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
@@ -760,7 +768,7 @@ def build_guides():
         others = "".join(f'<li><a href="/rehber/{o["slug"]}/">{esc(o["title"])}</a></li>' for o in GUIDES if o is not g)
         body = f"""
 <div class="wrap">{crumbs([("/rehber/", "Rehber"), (None, g["title"])])}
-<header class="page-head"><h1>{esc(g["title"])}</h1><p>{esc(g["desc"])}</p><div class="meta">{g["minutes"]} dk okuma</div></header>
+<header class="page-head"><h1>{esc(g["title"])}</h1><p>{esc(g["desc"])}</p><div class="meta"><time datetime="{g.get("updated") or g["date"]}">{"Güncellendi: " if g.get("updated") else ""}{tr_date(g.get("updated") or g["date"])}</time> · {g["minutes"]} dk okuma</div></header>
 {cover(g["img"])}
 <div class="layout">
 <article class="prose">
@@ -778,7 +786,7 @@ def build_guides():
 </div>
 """
         schema = [{"@context": "https://schema.org", "@type": "Article", "headline": g["title"], "description": g["desc"],
-                   "inLanguage": "tr", "image": ux(g["img"], 1200, 630), "datePublished": g["date"], "dateModified": g["date"], "mainEntityOfPage": SITE + path,
+                   "inLanguage": "tr", "image": ux(g["img"], 1200, 630), "datePublished": g["date"], "dateModified": g.get("updated") or g["date"], "mainEntityOfPage": SITE + path,
                    "author": {"@type": "Organization", "name": NAME, "url": SITE + "/"},
                    "publisher": {"@type": "Organization", "name": NAME, "url": SITE + "/"}},
                   crumbs_ld([("/rehber/", "Rehber"), (path, g["title"])])]
@@ -1346,13 +1354,22 @@ def build_404():
 def build_meta():
     newest = max([g["date"] for g in GUIDES] + ["2026-10-13"])
     urls = [("/", newest), ("/tesisler/", max([str(l.get("updated_at") or "")[:10] for l in LISTINGS] + ["2026-10-13"])), ("/tesisler/labella-bungalov/", "2026-10-13"), ("/rehber/", newest)] + \
-        [(f'/rehber/{g["slug"]}/', g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
+        [(f'/rehber/{g["slug"]}/', g.get("updated") or g["date"]) for g in GUIDES] + [(f'/tesisler/{l["slug"]}/', str(l.get("updated_at") or "")[:10] or TODAY) for l in LISTINGS] + \
         [("/uygulama/", "2026-10-14"), ("/hakkimizda/", "2026-10-13"), ("/kvkk/", "2026-10-14"), ("/uyelik-kosullari/", "2026-10-14"), ("/rozet/", "2026-10-15")] + \
         [(region_path(*k), max([str(l.get("updated_at") or "")[:10] for l in r["listings"]] + ["2026-10-14"])) for k, r in REGIONS.items()] + \
         [(region_path(il), "2026-10-14") for il in PROVINCES]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{SITE}{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls) + "</urlset>\n"
     write("/sitemap.xml", sm)
+    write(f"/{INDEXNOW_KEY}.txt", INDEXNOW_KEY)
+    items = ""
+    for g in GUIDES[:30]:
+        y, m, d = (int(x) for x in g["date"].split("-"))
+        pub = datetime.date(y, m, d).strftime("%a, %d %b %Y 09:00:00 +0300")
+        items += (f"<item><title>{esc(g['title'])}</title><link>{SITE}/rehber/{g['slug']}/</link>"
+                  f"<guid>{SITE}/rehber/{g['slug']}/</guid><pubDate>{pub}</pubDate><description>{esc(g['desc'])}</description></item>\n")
+    write("/rehber/feed.xml", f'<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel><title>{NAME} rehber yazıları</title>'
+          f"<link>{SITE}/rehber/</link><description>Bungalov seçimi, bölgeler ve tatil planlaması üzerine yazılar.</description><language>tr</language>\n{items}</channel></rss>\n")
     write("/robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
     write("/CNAME", "bungalovdunyasi.com\n")
     write("/.nojekyll", "")
